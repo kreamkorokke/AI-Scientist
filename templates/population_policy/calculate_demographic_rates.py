@@ -108,6 +108,50 @@ def format_rates_for_code(rates, name):
     
     print("]")
 
+def calculate_migration_rates(net_migration_total=153357, total_population=123103000):
+    """
+    Calculate age-specific migration rates from total net migration.
+    
+    Args:
+        net_migration_total: Total net migrants per year (positive = net immigration)
+        total_population: Total population
+    
+    Returns:
+        Array of migration rates by 5-year age group
+    """
+    print(f"\nCalculating migration rates for net migration = +{net_migration_total:,} people/year")
+    
+    # Age distribution of international migrants (typical pattern)
+    # Most migrants are working age, with some family members
+    age_migration_pattern = np.array([
+        0.02, 0.02, 0.03,  # 0-14 years (family migration)
+        0.08, 0.15, 0.20, 0.18, 0.12, 0.08,  # 15-44 years (working age peak)
+        0.05, 0.03, 0.02, 0.01, 0.01, 0.01,  # 45-74 years (declining)
+        0.00, 0.00, 0.00, 0.00, 0.00  # 75+ years (minimal)
+    ])
+    
+    # Normalize to sum to 1
+    age_migration_pattern = age_migration_pattern / age_migration_pattern.sum()
+    
+    # Japan population by age group (approximate from UN data, in thousands)
+    japan_age_pops = np.array([
+        4013, 4807, 5333,  # 0-14 years
+        5653, 6093, 6103, 6092, 6693, 7465,  # 15-44 years
+        8537, 8407, 7580, 7134, 6386, 4818,  # 45-74 years  
+        3500, 2500, 1500, 800, 400  # 75+ years (estimated)
+    ]) * 1000  # Convert to actual numbers
+    
+    # Calculate migrants per age group
+    migrants_by_age = net_migration_total * age_migration_pattern
+    
+    # Calculate migration rates (migrants per person per year in each age group)
+    migration_rates = migrants_by_age / japan_age_pops
+    
+    print(f"Total migration rate: {(net_migration_total/total_population)*100:.3f}% of population")
+    print(f"Verification: {migrants_by_age.sum():.0f} total migrants")
+    
+    return migration_rates
+
 def main():
     """Calculate and display demographic rates for Japan."""
     print("DEMOGRAPHIC RATE CALCULATION FOR JAPAN")
@@ -123,9 +167,13 @@ def main():
     # Calculate mortality rates  
     mortality_rates = calculate_mortality_rates(target_life_exp=84.9)
     
+    # Calculate migration rates
+    migration_rates = calculate_migration_rates(net_migration_total=153357)
+    
     # Format for code
     format_rates_for_code(fertility_rates, "fertility")
     format_rates_for_code(mortality_rates, "mortality")
+    format_rates_for_code(migration_rates, "migration")
     
     print("\nKEY INSIGHTS:")
     print("- Individual age-specific fertility rates are low because they represent")
@@ -134,6 +182,8 @@ def main():
     print("- Japan's pattern: peak fertility in 30-34 age group (delayed childbearing)")
     print("- Very low mortality rates reflect Japan's excellent healthcare system")
     print("- High life expectancy requires extremely low mortality in all age groups")
+    print("- Positive migration rates show Japan has net immigration (~153k/year)")
+    print("- Migration is concentrated in working age groups (20-40 years)")
 
 if __name__ == "__main__":
     main()

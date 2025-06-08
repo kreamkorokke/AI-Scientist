@@ -119,6 +119,26 @@ class JapanDemographicDataPipeline:
                     'age_end': -1
                 })
             
+            # Load net migration data
+            migration_file = self.data_dir / "net-migration.csv"
+            if not migration_file.exists():
+                raise FileNotFoundError(f"Required file {migration_file} not found.")
+            
+            migration_df = pd.read_csv(migration_file)
+            print(f"Loaded net migration data: {len(migration_df)} records")
+            
+            for _, row in migration_df.iterrows():
+                all_data.append({
+                    'indicator_id': 65,  # Total net migration
+                    'year': int(row['Time']),
+                    'value': float(row['Value']),
+                    'age_group': 'Total',
+                    'sex': row['Sex'],
+                    'variant': row['Variant'],
+                    'age_start': 0,
+                    'age_end': -1
+                })
+            
             df = pd.DataFrame(all_data)
             
             if not df.empty:
@@ -241,6 +261,18 @@ class JapanDemographicDataPipeline:
             }
         else:
             print("Warning: No life expectancy data found")
+        
+        # Net migration data
+        migration_data = un_data[un_data['indicator_id'] == 65].sort_values('year')
+        
+        if not migration_data.empty:
+            processed['net_migration'] = {
+                'years': migration_data['year'].values,
+                'net_migration': migration_data['value'].values
+            }
+            print(f"Net migration 2024: {migration_data['value'].iloc[0]:,.0f} people/year")
+        else:
+            print("Warning: No net migration data found")
         
         return processed
 

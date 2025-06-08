@@ -61,13 +61,14 @@ class DemographicModelConfig:
             ]
             
         if self.base_migration_rates is None:
-            # Japan net migration rates (positive = net immigration)
-            # Currently negative for most age groups due to emigration > immigration
+            # Japan net migration rates by age group (UN World Population Prospects 2024)
+            # Based on +153,357 net migrants per year, distributed by typical age patterns
+            # Positive values = net immigration (more people coming in than leaving)
             self.base_migration_rates = [
-                0.0001, 0.0001, 0.0002,  # 0-14 years
-                0.0005, 0.0008, 0.0003, -0.0002, -0.0005, -0.0003,  # 15-49 years
-                -0.0001, -0.0001, 0.0000, 0.0000, 0.0000, 0.0000,  # 50+ years
-                0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000
+                0.000757, 0.000632, 0.000854,  # 0-14 years (family migration)
+                0.002149, 0.003738, 0.004976, 0.004486, 0.002722, 0.001627,  # 15-44 years (peak working age)
+                0.000889, 0.000542, 0.000401, 0.000213, 0.000238, 0.000315,  # 45-74 years (declining)
+                0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000   # 75+ years (minimal)
             ]
 
 class PolicyEffectsCalculator:

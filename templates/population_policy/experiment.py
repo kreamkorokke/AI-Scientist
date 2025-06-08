@@ -704,7 +704,7 @@ class PopulationExperiment:
 def main():
     parser = argparse.ArgumentParser(description="Mathematical Population Dynamics Modeling")
     parser.add_argument("--model_type", type=str, 
-                       default=os.getenv("DEFAULT_MODEL_TYPE", "leslie_matrix"),
+                       default=os.getenv("DEFAULT_MODEL_TYPE", "stochastic_leslie"),
                        choices=["leslie_matrix", "cohort_component", "stochastic_leslie"])
     parser.add_argument("--age_groups", type=int, 
                        default=int(os.getenv("DEFAULT_AGE_GROUPS", "21")))

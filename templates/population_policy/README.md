@@ -46,7 +46,7 @@ cp .env.example .env
 
 ### 3. Run Basic Experiment
 ```bash
-python experiment.py --model_type leslie_matrix --projection_years 30
+python experiment.py --model_type stochastic_leslie --projection_years 30
 ```
 
 ### 4. Generate Visualizations
@@ -197,7 +197,7 @@ UN_DATA_DIR=un_population_data
 ### Model Defaults
 ```bash
 # Override command-line defaults
-DEFAULT_MODEL_TYPE=leslie_matrix
+DEFAULT_MODEL_TYPE=stochastic_leslie
 DEFAULT_PROJECTION_YEARS=30
 DEFAULT_AGE_GROUPS=21
 DEFAULT_POLICY_SENSITIVITY=1.0

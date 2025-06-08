@@ -102,19 +102,29 @@ class PopulationPlotter:
             # Handle different data structures from mathematical models
             if 'total_population' in data:
                 total_pop = np.array(data['total_population']) / 1000  # Convert to thousands
-            elif 'total_population_mean' in data:  # Stochastic model
+                is_stochastic = False
+            elif 'total_population_mean' in data:  # Stochastic model (old format)
                 total_pop = np.array(data['total_population_mean']) / 1000
+                is_stochastic = True
             else:
                 continue
                 
             color = self.policy_colors.get(scenario_name, None)
             
+            # Plot main trajectory
             if 'baseline' in scenario_name or 'comprehensive' in scenario_name:
                 ax1.plot(years, total_pop, label=scenario_name.replace('_', ' ').title(), 
                         linewidth=3, color=color)
             else:
                 ax1.plot(years, total_pop, label=scenario_name.replace('_', ' ').title(), 
                         linewidth=2, alpha=0.8, color=color)
+            
+            # Add uncertainty bands for stochastic models
+            if is_stochastic and 'total_population_p5' in data and 'total_population_p95' in data:
+                p5 = np.array(data['total_population_p5']) / 1000
+                p95 = np.array(data['total_population_p95']) / 1000
+                ax1.fill_between(years, p5, p95, alpha=0.2, color=color, 
+                               label=f"{scenario_name.replace('_', ' ').title()} (90% CI)" if len(years) == len(p5) else None)
         
         ax1.set_xlabel('Year')
         ax1.set_ylabel('Population (thousands)')
@@ -578,6 +588,146 @@ class PopulationPlotter:
             plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
         plt.close()
     
+    def plot_uncertainty_analysis(self, save_path: Optional[str] = None):
+        """Plot uncertainty analysis for stochastic models."""
+        if 'policy_simulations' not in self.results:
+            print("No policy simulation data found.")
+            return
+        
+        simulations = self.results['policy_simulations']
+        
+        # Check if we have stochastic data
+        has_stochastic = any('total_population_std' in data for data in simulations.values())
+        if not has_stochastic:
+            print("No stochastic data found. Uncertainty analysis requires stochastic_leslie model.")
+            return
+        
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
+        
+        base_year = 2024
+        projection_years = self.config.get('projection_years', 50)
+        years = np.arange(base_year, base_year + projection_years + 1)
+        
+        # 1. Population uncertainty bands (baseline vs comprehensive)
+        key_scenarios = ['baseline', 'comprehensive']
+        for scenario_name in key_scenarios:
+            if scenario_name in simulations:
+                data = simulations[scenario_name]
+                color = self.policy_colors.get(scenario_name, 'gray')
+                
+                # Mean trajectory
+                mean_pop = np.array(data['total_population']) / 1000
+                ax1.plot(years, mean_pop, label=f"{scenario_name.title()} (Mean)", 
+                        linewidth=3, color=color)
+                
+                # Uncertainty bands
+                if 'total_population_p5' in data and 'total_population_p95' in data:
+                    p5 = np.array(data['total_population_p5']) / 1000
+                    p25 = np.array(data['total_population_p25']) / 1000 if 'total_population_p25' in data else p5
+                    p75 = np.array(data['total_population_p75']) / 1000 if 'total_population_p75' in data else mean_pop
+                    p95 = np.array(data['total_population_p95']) / 1000
+                    
+                    # 50% confidence interval (dark)
+                    ax1.fill_between(years, p25, p75, alpha=0.4, color=color, 
+                                   label=f"{scenario_name.title()} (50% CI)")
+                    # 90% confidence interval (light)  
+                    ax1.fill_between(years, p5, p95, alpha=0.2, color=color,
+                                   label=f"{scenario_name.title()} (90% CI)")
+        
+        ax1.set_xlabel('Year')
+        ax1.set_ylabel('Population (thousands)')
+        ax1.set_title('Population Uncertainty Bands (Stochastic Projections)')
+        ax1.legend()
+        ax1.grid(True, alpha=0.3)
+        
+        # 2. Aging ratio uncertainty
+        for scenario_name in key_scenarios:
+            if scenario_name in simulations:
+                data = simulations[scenario_name]
+                color = self.policy_colors.get(scenario_name, 'gray')
+                
+                # Mean aging ratio
+                mean_aging = np.array(data['aging_ratio']) * 100
+                ax2.plot(years, mean_aging, label=f"{scenario_name.title()} (Mean)", 
+                        linewidth=3, color=color)
+                
+                # Uncertainty bands for aging ratio
+                if 'aging_ratio_p5' in data and 'aging_ratio_p95' in data:
+                    p5_aging = np.array(data['aging_ratio_p5']) * 100
+                    p95_aging = np.array(data['aging_ratio_p95']) * 100
+                    
+                    ax2.fill_between(years, p5_aging, p95_aging, alpha=0.3, color=color,
+                                   label=f"{scenario_name.title()} (90% CI)")
+        
+        ax2.set_xlabel('Year')
+        ax2.set_ylabel('Aging Ratio (%)')
+        ax2.set_title('Aging Ratio Uncertainty (65+ Population %)')
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+        
+        # 3. Policy effectiveness with uncertainty
+        baseline_data = simulations.get('baseline', {})
+        if 'total_population' in baseline_data:
+            baseline_mean = np.array(baseline_data['total_population'])
+            
+            for scenario_name, data in simulations.items():
+                if scenario_name != 'baseline' and 'total_population' in data:
+                    color = self.policy_colors.get(scenario_name, 'gray')
+                    
+                    # Mean effectiveness
+                    scenario_mean = np.array(data['total_population'])
+                    effectiveness_mean = ((scenario_mean - baseline_mean) / baseline_mean) * 100
+                    
+                    ax3.plot(years, effectiveness_mean, label=f"{scenario_name.replace('_', ' ').title()}", 
+                            linewidth=2, color=color)
+                    
+                    # Add uncertainty if available
+                    if ('total_population_p5' in data and 'total_population_p95' in data and 
+                        'total_population_p5' in baseline_data and 'total_population_p95' in baseline_data):
+                        
+                        # Calculate effectiveness bounds
+                        scenario_p5 = np.array(data['total_population_p5'])
+                        scenario_p95 = np.array(data['total_population_p95'])
+                        baseline_p95 = np.array(baseline_data['total_population_p95'])
+                        baseline_p5 = np.array(baseline_data['total_population_p5'])
+                        
+                        # Conservative uncertainty: worst case for policy effectiveness
+                        eff_low = ((scenario_p5 - baseline_p95) / baseline_p95) * 100
+                        eff_high = ((scenario_p95 - baseline_p5) / baseline_p5) * 100
+                        
+                        ax3.fill_between(years, eff_low, eff_high, alpha=0.2, color=color)
+        
+        ax3.set_xlabel('Year')
+        ax3.set_ylabel('Population Difference vs Baseline (%)')
+        ax3.set_title('Policy Effectiveness with Uncertainty')
+        ax3.legend()
+        ax3.grid(True, alpha=0.3)
+        ax3.axhline(y=0, color='black', linestyle='-', alpha=0.5)
+        
+        # 4. Uncertainty magnitude over time
+        for scenario_name in ['baseline', 'comprehensive']:
+            if scenario_name in simulations:
+                data = simulations[scenario_name]
+                color = self.policy_colors.get(scenario_name, 'gray')
+                
+                if 'total_population_std' in data:
+                    uncertainty = np.array(data['total_population_std']) / 1000  # Convert to thousands
+                    ax4.plot(years, uncertainty, label=f"{scenario_name.title()}", 
+                            linewidth=2, color=color)
+        
+        ax4.set_xlabel('Year')
+        ax4.set_ylabel('Population Standard Deviation (thousands)')
+        ax4.set_title('Projection Uncertainty Over Time')
+        ax4.legend()
+        ax4.grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        
+        if save_path:
+            dpi = int(os.getenv("PLOT_DPI", "300"))
+            plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
+        plt.close()
+    
     def create_summary_report(self, save_dir: Optional[str] = None):
         """Create a comprehensive summary report with all visualizations."""
         if save_dir is None:
@@ -594,6 +744,7 @@ class PopulationPlotter:
         self.plot_policy_feature_analysis(save_dir / "policy_analysis.png")
         self.plot_demographic_transition(save_dir / "demographic_transition.png")
         self.plot_step_by_step_changes(save_dir / "step_by_step_changes.png")
+        self.plot_uncertainty_analysis(save_dir / "uncertainty_analysis.png")
         
         print(f"Report saved to {save_dir}/")
         
@@ -629,7 +780,7 @@ def main():
     
     parser = argparse.ArgumentParser(description="Generate population analysis plots")
     parser.add_argument("--plot_type", type=str, default="all",
-                       choices=["projections", "policy", "transition", "step_by_step", "all"],
+                       choices=["projections", "policy", "transition", "step_by_step", "uncertainty", "all"],
                        help="Type of plot to generate")
     
     args = parser.parse_args()
@@ -659,6 +810,8 @@ def main():
                 plotter.plot_demographic_transition(f"{run_dir}/demographic_transition.png")
             elif args.plot_type == "step_by_step":
                 plotter.plot_step_by_step_changes(f"{run_dir}/step_by_step_changes.png")
+            elif args.plot_type == "uncertainty":
+                plotter.plot_uncertainty_analysis(f"{run_dir}/uncertainty_analysis.png")
             elif args.plot_type == "all":
                 plotter.create_summary_report(run_dir)
                 

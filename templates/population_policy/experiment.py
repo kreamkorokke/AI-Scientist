@@ -2,15 +2,15 @@
 Pure Mathematical Population Dynamics Modeling and Policy Simulation
 
 This module implements deterministic and stochastic demographic models using
-classical mathematical approaches (Leslie matrices, cohort-component method)
-with policy intervention parameters affecting demographic rates directly.
+classical Leslie matrix approaches with policy intervention parameters 
+affecting demographic rates directly.
 """
 
 import argparse
 import json
 import os
 import pickle
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 from dataclasses import dataclass
@@ -26,7 +26,7 @@ from data_pipeline import JapanDemographicDataPipeline
 @dataclass
 class DemographicModelConfig:
     """Configuration for mathematical demographic models."""
-    model_type: str = "leslie_matrix"  # leslie_matrix, cohort_component, stochastic_leslie
+    model_type: str = "leslie_matrix"  # leslie_matrix, stochastic_leslie
     age_groups: int = 21  # 0-4, 5-9, ..., 95-99, 100+
     projection_years: int = 30  # Years to project forward
     time_step: float = 1.0  # Years per time step (1.0 for annual, 0.25 for quarterly)
@@ -265,92 +265,6 @@ class LeslieMatrixModel:
         
         return trajectory
 
-class CohortComponentModel:
-    """
-    Cohort-component method for population projection.
-    More detailed than Leslie matrix, tracks births and deaths separately.
-    """
-    
-    def __init__(self, config: DemographicModelConfig):
-        self.config = config
-        self.policy_calculator = PolicyEffectsCalculator(config.policy_sensitivity)
-        
-        # Convert base rates
-        self.base_fertility = np.array(config.base_fertility_rates)
-        self.base_mortality = np.array(config.base_mortality_rates)
-        self.base_migration = np.array(config.base_migration_rates)
-        
-        # Resize if needed
-        if len(self.base_fertility) != config.age_groups:
-            self.base_fertility = np.resize(self.base_fertility, config.age_groups)
-        if len(self.base_mortality) != config.age_groups:
-            self.base_mortality = np.resize(self.base_mortality, config.age_groups)
-        if len(self.base_migration) != config.age_groups:
-            self.base_migration = np.resize(self.base_migration, config.age_groups)
-    
-    def project_population(self, initial_population: np.ndarray, policy_vector: np.ndarray,
-                          years: int) -> Dict[str, np.ndarray]:
-        """
-        Project population using cohort-component method.
-        
-        Returns:
-            Dictionary with population, births, deaths, migrations trajectories
-        """
-        # Get adjusted rates
-        fertility, mortality, migration = self.policy_calculator.apply_policy_effects(
-            self.base_fertility, self.base_mortality, self.base_migration, policy_vector
-        )
-        
-        # Initialize arrays
-        population = np.zeros((years + 1, self.config.age_groups))
-        births = np.zeros(years + 1)
-        deaths = np.zeros((years + 1, self.config.age_groups))
-        migrations = np.zeros((years + 1, self.config.age_groups))
-        
-        population[0] = initial_population.copy()
-        
-        for year in range(years):
-            current_pop = population[year]
-            
-            # Calculate births (from all reproductive age women)
-            births[year + 1] = np.sum(current_pop * fertility)
-            
-            # Calculate deaths by age group
-            deaths[year + 1] = current_pop * mortality
-            
-            # Calculate net migration by age group
-            migrations[year + 1] = current_pop * migration
-            
-            # Update population:
-            # 1. Age everyone by one time step
-            next_pop = np.zeros(self.config.age_groups)
-            
-            # New births go to age group 0
-            next_pop[0] = births[year + 1]
-            
-            # Everyone else ages up (minus deaths)
-            for age in range(self.config.age_groups - 1):
-                survivors = current_pop[age] - deaths[year + 1, age]
-                next_pop[age + 1] += survivors
-            
-            # Oldest age group doesn't age out
-            survivors = current_pop[-1] - deaths[year + 1, -1]
-            next_pop[-1] += survivors
-            
-            # Add migration
-            next_pop += migrations[year + 1]
-            
-            # Ensure non-negative
-            next_pop = np.maximum(next_pop, 0)
-            
-            population[year + 1] = next_pop
-        
-        return {
-            'population': population,
-            'births': births,
-            'deaths': deaths,
-            'migrations': migrations
-        }
 
 class StochasticLeslieModel:
     """
@@ -412,8 +326,6 @@ class PopulationExperiment:
         # Initialize model based on type
         if config.model_type == "leslie_matrix":
             self.model = LeslieMatrixModel(config)
-        elif config.model_type == "cohort_component":
-            self.model = CohortComponentModel(config)
         elif config.model_type == "stochastic_leslie":
             self.model = StochasticLeslieModel(config)
         else:
@@ -514,32 +426,81 @@ class PopulationExperiment:
                     self.config.monte_carlo_runs
                 )
                 
+                # Calculate detailed demographics from mean trajectory
+                mean_trajectory = results['mean']
+                total_population_by_step = mean_trajectory.sum(axis=1)
+                aging_ratio_by_step = mean_trajectory[:, 13:].sum(axis=1) / mean_trajectory.sum(axis=1)  # 65+ ratio
+                working_age_pop = mean_trajectory[:, 3:13].sum(axis=1)  # 15-64 age groups
+                young_pop = mean_trajectory[:, :3].sum(axis=1)  # 0-14 age groups  
+                elderly_pop = mean_trajectory[:, 13:].sum(axis=1)  # 65+ age groups
+                dependency_ratio_by_step = ((young_pop + elderly_pop) / working_age_pop) * 100
+                
+                # Calculate year-over-year changes from mean
+                population_changes = np.diff(total_population_by_step)
+                population_growth_rates = (population_changes / total_population_by_step[:-1]) * 100
+                
+                # Calculate uncertainty bounds for key demographic indicators from all runs
+                all_trajectories = results['all_runs']  # Shape: (n_runs, years+1, age_groups)
+                
+                # Total population uncertainty
+                all_total_pops = all_trajectories.sum(axis=2)  # Sum across age groups for each run
+                total_pop_std = np.std(all_total_pops, axis=0)
+                total_pop_p5 = np.percentile(all_total_pops, 5, axis=0)
+                total_pop_p95 = np.percentile(all_total_pops, 95, axis=0)
+                
+                # Aging ratio uncertainty (65+ / total population)
+                all_elderly = all_trajectories[:, :, 13:].sum(axis=2)  # Sum 65+ age groups
+                all_aging_ratios = all_elderly / all_total_pops
+                aging_ratio_std = np.std(all_aging_ratios, axis=0)
+                aging_ratio_p5 = np.percentile(all_aging_ratios, 5, axis=0)
+                aging_ratio_p95 = np.percentile(all_aging_ratios, 95, axis=0)
+                
+                # Dependency ratio uncertainty
+                all_young = all_trajectories[:, :, :3].sum(axis=2)  # Sum 0-14 age groups
+                all_working = all_trajectories[:, :, 3:13].sum(axis=2)  # Sum 15-64 age groups
+                all_dependency_ratios = ((all_young + all_elderly) / all_working) * 100
+                dependency_ratio_std = np.std(all_dependency_ratios, axis=0)
+                dependency_ratio_p5 = np.percentile(all_dependency_ratios, 5, axis=0)
+                dependency_ratio_p95 = np.percentile(all_dependency_ratios, 95, axis=0)
+                
                 simulation_results[scenario_name] = {
                     'policy_vector': policy_vector,
+                    
+                    # Mean trajectory detailed metrics (same as vanilla leslie)
+                    'population_trajectory': mean_trajectory,
+                    'total_population': total_population_by_step,
+                    'young_population': young_pop,  # 0-14 age groups
+                    'working_age_population': working_age_pop,  # 15-64 age groups  
+                    'elderly_population': elderly_pop,  # 65+ age groups
+                    'aging_ratio': aging_ratio_by_step,
+                    'dependency_ratio': dependency_ratio_by_step,
+                    'population_changes': population_changes,  # Year-over-year absolute changes
+                    'population_growth_rates': population_growth_rates,  # Year-over-year % changes
+                    'years': np.arange(2024, 2024 + self.config.projection_years + 1),  # Year labels
+                    
+                    # Full uncertainty information
                     'population_mean': results['mean'],
                     'population_std': results['std'],
                     'population_p5': results['percentile_5'],
+                    'population_p25': results['percentile_25'],
+                    'population_p75': results['percentile_75'],
                     'population_p95': results['percentile_95'],
-                    'total_population_mean': results['mean'].sum(axis=1),
-                    'total_population_std': results['std'].sum(axis=1),
-                }
-                
-            elif self.config.model_type == "cohort_component":
-                # Run detailed cohort-component projection
-                results = self.model.project_population(
-                    initial_pop, policy_vector, self.config.projection_years
-                )
-                
-                simulation_results[scenario_name] = {
-                    'policy_vector': policy_vector,
-                    'population_trajectory': results['population'],
-                    'births_trajectory': results['births'],
-                    'deaths_trajectory': results['deaths'],
-                    'migrations_trajectory': results['migrations'],
-                    'total_population': results['population'].sum(axis=1),
-                    'total_births': results['births'],
-                    'total_deaths': results['deaths'].sum(axis=1),
-                    'total_migrations': results['migrations'].sum(axis=1),
+                    
+                    # Key demographic indicators with uncertainty bounds
+                    'total_population_std': total_pop_std,
+                    'total_population_p5': total_pop_p5,
+                    'total_population_p95': total_pop_p95,
+                    
+                    'aging_ratio_std': aging_ratio_std,
+                    'aging_ratio_p5': aging_ratio_p5,
+                    'aging_ratio_p95': aging_ratio_p95,
+                    
+                    'dependency_ratio_std': dependency_ratio_std,
+                    'dependency_ratio_p5': dependency_ratio_p5,
+                    'dependency_ratio_p95': dependency_ratio_p95,
+                    
+                    # Full Monte Carlo results for advanced analysis
+                    'all_runs': all_trajectories,
                 }
                 
             else:  # leslie_matrix
@@ -705,7 +666,7 @@ def main():
     parser = argparse.ArgumentParser(description="Mathematical Population Dynamics Modeling")
     parser.add_argument("--model_type", type=str, 
                        default=os.getenv("DEFAULT_MODEL_TYPE", "stochastic_leslie"),
-                       choices=["leslie_matrix", "cohort_component", "stochastic_leslie"])
+                       choices=["leslie_matrix", "stochastic_leslie"])
     parser.add_argument("--age_groups", type=int, 
                        default=int(os.getenv("DEFAULT_AGE_GROUPS", "21")))
     parser.add_argument("--projection_years", type=int, 

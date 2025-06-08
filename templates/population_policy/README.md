@@ -8,8 +8,7 @@ This template extends AI-Scientist to tackle Japan's population decline challeng
 
 ### 🧠 **Mathematical Population Models**
 - **Classical Leslie Matrix**: Age-structured population dynamics with fertility and survival rates
-- **Cohort-Component Method**: Detailed demographic accounting (births, deaths, migrations)
-- **Stochastic Simulation**: Monte Carlo population projection with uncertainty quantification
+- **Stochastic Leslie Matrix**: Monte Carlo population projection with uncertainty quantification
 - **Policy Integration**: 10-dimensional policy feature space affecting demographic parameters
 
 ### 📊 **Data Integration**
@@ -62,13 +61,6 @@ Classical demographic projection matrices:
 - Age-specific survival rates (1 - mortality rates)
 - Migration effects applied as additive terms
 - Policy parameters directly modify demographic rates
-
-### Cohort-Component Method
-Standard demographic accounting approach:
-- Separate tracking of births, deaths, and migrations
-- Age progression through cohort advancement
-- Policy effects applied to component rates
-- More detailed than Leslie matrix for demographic analysis
 
 ### Stochastic Leslie Model
 Monte Carlo population simulation:

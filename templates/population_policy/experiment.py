@@ -651,7 +651,54 @@ class PopulationExperiment:
             summary_df = pd.DataFrame(self.results['summary_metrics']).T
             summary_df.to_csv(f"{save_dir}/summary_metrics.csv")
         
+        # Generate final_info.json for AI-Scientist compatibility
+        self._generate_final_info(save_dir)
+        
         print(f"Results saved to {save_dir}/")
+    
+    def _generate_final_info(self, save_dir: str):
+        """Generate final_info.json file compatible with AI-Scientist framework."""
+        if 'policy_simulations' not in self.results:
+            return
+        
+        # Extract key metrics for each policy scenario
+        final_info = {}
+        
+        for scenario_name, data in self.results['policy_simulations'].items():
+            if 'total_population' in data and len(data['total_population']) > 0:
+                initial_pop = data['total_population'][0]
+                final_pop = data['total_population'][-1]
+                
+                # Key demographic metrics
+                population_decline_pct = ((final_pop - initial_pop) / initial_pop) * 100
+                final_aging_ratio = data['aging_ratio'][-1] * 100 if 'aging_ratio' in data else 0
+                final_dependency_ratio = data['dependency_ratio'][-1] if 'dependency_ratio' in data else 0
+                
+                # Average annual decline rate
+                years = len(data['total_population']) - 1
+                annual_decline_rate = ((final_pop / initial_pop) ** (1/years) - 1) * 100 if years > 0 else 0
+                
+                # Policy effectiveness (vs baseline if available)
+                if scenario_name != 'baseline' and 'baseline' in self.results['policy_simulations']:
+                    baseline_final = self.results['policy_simulations']['baseline']['total_population'][-1]
+                    policy_effectiveness = ((final_pop - baseline_final) / baseline_final) * 100
+                else:
+                    policy_effectiveness = 0.0
+                
+                final_info[scenario_name] = {
+                    'population_decline_pct': float(population_decline_pct),
+                    'annual_decline_rate': float(annual_decline_rate),
+                    'final_aging_ratio_pct': float(final_aging_ratio),
+                    'final_dependency_ratio': float(final_dependency_ratio),
+                    'policy_effectiveness_pct': float(policy_effectiveness),
+                    'final_population_millions': float(final_pop / 1000)  # Convert to millions
+                }
+        
+        # Save final_info.json
+        with open(f"{save_dir}/final_info.json", "w") as f:
+            json.dump(final_info, f, indent=2)
+        
+        print(f"Generated final_info.json with {len(final_info)} policy scenarios")
 
 def main():
     parser = argparse.ArgumentParser(description="Mathematical Population Dynamics Modeling")

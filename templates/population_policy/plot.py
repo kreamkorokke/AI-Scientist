@@ -64,13 +64,23 @@ class PopulationPlotter:
             with open(self.results_dir / "config.json", "r") as f:
                 self.config = json.load(f)
                 
-            print("Results loaded successfully!")
+            # Also load final_info.json if available (for AI-Scientist compatibility)
+            final_info_path = self.results_dir / "final_info.json"
+            if final_info_path.exists():
+                with open(final_info_path, "r") as f:
+                    self.final_info = json.load(f)
+                print("Results and final_info loaded successfully!")
+            else:
+                self.final_info = {}
+                print("Results loaded successfully!")
+                
             print(f"Model type: {self.config.get('model_type', 'Unknown')}")
             
         except FileNotFoundError:
             print("No results found. Run experiment first.")
             self.results = {}
             self.config = {}
+            self.final_info = {}
     
     
     def plot_population_projections(self, save_path: Optional[str] = None):

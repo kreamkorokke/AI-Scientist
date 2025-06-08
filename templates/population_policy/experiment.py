@@ -545,13 +545,30 @@ class PopulationExperiment:
                     initial_pop, policy_vector, self.config.projection_years
                 )
                 
+                # Calculate step-by-step metrics
+                total_population_by_step = trajectory.sum(axis=1)
+                aging_ratio_by_step = trajectory[:, 13:].sum(axis=1) / trajectory.sum(axis=1)  # 65+ ratio
+                working_age_pop = trajectory[:, 3:13].sum(axis=1)  # 15-64 age groups
+                young_pop = trajectory[:, :3].sum(axis=1)  # 0-14 age groups  
+                elderly_pop = trajectory[:, 13:].sum(axis=1)  # 65+ age groups
+                dependency_ratio_by_step = ((young_pop + elderly_pop) / working_age_pop) * 100
+                
+                # Calculate year-over-year changes
+                population_changes = np.diff(total_population_by_step)
+                population_growth_rates = (population_changes / total_population_by_step[:-1]) * 100
+                
                 simulation_results[scenario_name] = {
                     'policy_vector': policy_vector,
                     'population_trajectory': trajectory,
-                    'total_population': trajectory.sum(axis=1),
-                    'aging_ratio': trajectory[:, 13:].sum(axis=1) / trajectory.sum(axis=1),  # 65+ ratio
-                    'dependency_ratio': ((trajectory[:, :3].sum(axis=1) + trajectory[:, 13:].sum(axis=1)) / 
-                                       trajectory[:, 3:13].sum(axis=1)) * 100,  # (young + old) / working age
+                    'total_population': total_population_by_step,
+                    'young_population': young_pop,  # 0-14 age groups
+                    'working_age_population': working_age_pop,  # 15-64 age groups  
+                    'elderly_population': elderly_pop,  # 65+ age groups
+                    'aging_ratio': aging_ratio_by_step,
+                    'dependency_ratio': dependency_ratio_by_step,
+                    'population_changes': population_changes,  # Year-over-year absolute changes
+                    'population_growth_rates': population_growth_rates,  # Year-over-year % changes
+                    'years': np.arange(2024, 2024 + self.config.projection_years + 1),  # Year labels
                 }
         
         self.results['policy_simulations'] = simulation_results

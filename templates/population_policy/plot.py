@@ -3,6 +3,8 @@ Visualization module for population dynamics and policy simulation results.
 Generates comprehensive plots for demographic analysis and policy impact assessment.
 """
 
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
@@ -70,44 +72,6 @@ class PopulationPlotter:
             self.results = {}
             self.config = {}
     
-    def plot_training_curves(self, save_path: Optional[str] = None):
-        """Plot model training and validation curves."""
-        if 'train_losses' not in self.results:
-            print("No training data found (mathematical models don't require training).")
-            return
-        
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
-        
-        # Training curves
-        epochs = range(len(self.results['train_losses']))
-        ax1.plot(epochs, self.results['train_losses'], label='Training Loss', linewidth=2)
-        ax1.plot(epochs, self.results['val_losses'], label='Validation Loss', linewidth=2)
-        ax1.set_xlabel('Epoch')
-        ax1.set_ylabel('MSE Loss')
-        ax1.set_title('Model Training Progress')
-        ax1.legend()
-        ax1.grid(True, alpha=0.3)
-        ax1.set_yscale('log')
-        
-        # Loss comparison (last 50 epochs)
-        recent_epochs = max(50, len(epochs) // 4)
-        recent_train = self.results['train_losses'][-recent_epochs:]
-        recent_val = self.results['val_losses'][-recent_epochs:]
-        
-        ax2.plot(range(recent_epochs), recent_train, label='Training Loss', linewidth=2)
-        ax2.plot(range(recent_epochs), recent_val, label='Validation Loss', linewidth=2)
-        ax2.set_xlabel(f'Last {recent_epochs} Epochs')
-        ax2.set_ylabel('MSE Loss')
-        ax2.set_title('Recent Training Progress')
-        ax2.legend()
-        ax2.grid(True, alpha=0.3)
-        
-        plt.tight_layout()
-        
-        if save_path:
-            dpi = int(os.getenv("PLOT_DPI", "300"))
-            plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
-        plt.show()
     
     def plot_population_projections(self, save_path: Optional[str] = None):
         """Plot population projections under different policy scenarios."""
@@ -219,7 +183,7 @@ class PopulationPlotter:
         if save_path:
             dpi = int(os.getenv("PLOT_DPI", "300"))
             plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
-        plt.show()
+        plt.close()
     
     def plot_policy_feature_analysis(self, save_path: Optional[str] = None):
         """Analyze and visualize policy features and their impacts."""
@@ -350,7 +314,101 @@ class PopulationPlotter:
         if save_path:
             dpi = int(os.getenv("PLOT_DPI", "300"))
             plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
-        plt.show()
+        plt.close()
+    
+    def plot_step_by_step_changes(self, save_path: Optional[str] = None):
+        """Plot detailed step-by-step population changes over time."""
+        if 'policy_simulations' not in self.results:
+            print("No policy simulation data found.")
+            return
+        
+        simulations = self.results['policy_simulations']
+        
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
+        
+        # 1. Year-over-year population growth rates
+        for scenario_name, data in simulations.items():
+            if 'random' not in scenario_name and 'population_growth_rates' in data:
+                years = data['years'][1:]  # Growth rates start from year 2
+                growth_rates = data['population_growth_rates']
+                color = self.policy_colors.get(scenario_name, 'gray')
+                
+                ax1.plot(years, growth_rates, label=scenario_name.replace('_', ' ').title(), 
+                        linewidth=2, color=color)
+        
+        ax1.set_xlabel('Year')
+        ax1.set_ylabel('Population Growth Rate (%)')
+        ax1.set_title('Year-over-Year Population Growth Rates by Policy')
+        ax1.legend()
+        ax1.grid(True, alpha=0.3)
+        ax1.axhline(y=0, color='black', linestyle='-', alpha=0.5)
+        
+        # 2. Population composition over time (stacked areas)
+        baseline_data = simulations.get('baseline', simulations[list(simulations.keys())[0]])
+        years = baseline_data['years']
+        
+        # Convert to percentages
+        total_pop = baseline_data['total_population']
+        young_pct = (baseline_data['young_population'] / total_pop) * 100
+        working_pct = (baseline_data['working_age_population'] / total_pop) * 100  
+        elderly_pct = (baseline_data['elderly_population'] / total_pop) * 100
+        
+        ax2.fill_between(years, 0, young_pct, alpha=0.7, color='lightblue', label='0-14 years')
+        ax2.fill_between(years, young_pct, young_pct + working_pct, alpha=0.7, color='lightgreen', label='15-64 years')
+        ax2.fill_between(years, young_pct + working_pct, 100, alpha=0.7, color='lightcoral', label='65+ years')
+        
+        ax2.set_xlabel('Year')
+        ax2.set_ylabel('Population Share (%)')
+        ax2.set_title('Population Age Composition Over Time (Baseline)')
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+        ax2.set_ylim(0, 100)
+        
+        # 3. Absolute population changes by age group
+        for scenario_name, data in simulations.items():
+            if scenario_name == 'baseline':  # Focus on baseline for clarity
+                years = data['years']
+                color = self.policy_colors.get(scenario_name, 'gray')
+                
+                ax3.plot(years, data['young_population']/1000, label='0-14 years', 
+                        linewidth=2, color='blue', linestyle='-')
+                ax3.plot(years, data['working_age_population']/1000, label='15-64 years',
+                        linewidth=2, color='green', linestyle='-')  
+                ax3.plot(years, data['elderly_population']/1000, label='65+ years',
+                        linewidth=2, color='red', linestyle='-')
+                break
+        
+        ax3.set_xlabel('Year')
+        ax3.set_ylabel('Population (millions)')
+        ax3.set_title('Population by Age Group Over Time (Baseline)')
+        ax3.legend()
+        ax3.grid(True, alpha=0.3)
+        
+        # 4. Policy effectiveness over time (cumulative population difference vs baseline)
+        baseline_pop = simulations['baseline']['total_population']
+        years = simulations['baseline']['years']
+        
+        for scenario_name, data in simulations.items():
+            if scenario_name != 'baseline' and 'random' not in scenario_name:
+                pop_difference = ((data['total_population'] - baseline_pop) / baseline_pop) * 100
+                color = self.policy_colors.get(scenario_name, 'gray')
+                
+                ax4.plot(years, pop_difference, label=scenario_name.replace('_', ' ').title(),
+                        linewidth=2, color=color)
+        
+        ax4.set_xlabel('Year') 
+        ax4.set_ylabel('Population Difference vs Baseline (%)')
+        ax4.set_title('Policy Impact Over Time (vs Baseline)')
+        ax4.legend()
+        ax4.grid(True, alpha=0.3)
+        ax4.axhline(y=0, color='black', linestyle='-', alpha=0.5)
+        
+        plt.tight_layout()
+        
+        if save_path:
+            dpi = int(os.getenv("PLOT_DPI", "300"))
+            plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
+        plt.close()
     
     def plot_demographic_transition(self, save_path: Optional[str] = None):
         """Plot demographic transition analysis."""
@@ -508,7 +566,7 @@ class PopulationPlotter:
         if save_path:
             dpi = int(os.getenv("PLOT_DPI", "300"))
             plt.savefig(save_path, dpi=dpi, bbox_inches='tight')
-        plt.show()
+        plt.close()
     
     def create_summary_report(self, save_dir: Optional[str] = None):
         """Create a comprehensive summary report with all visualizations."""
@@ -522,10 +580,10 @@ class PopulationPlotter:
         print("Generating comprehensive population analysis report...")
         
         # Generate all plots
-        self.plot_training_curves(save_dir / "training_curves.png")
         self.plot_population_projections(save_dir / "population_projections.png")
         self.plot_policy_feature_analysis(save_dir / "policy_analysis.png")
         self.plot_demographic_transition(save_dir / "demographic_transition.png")
+        self.plot_step_by_step_changes(save_dir / "step_by_step_changes.png")
         
         print(f"Report saved to {save_dir}/")
         
@@ -561,7 +619,7 @@ def main():
     
     parser = argparse.ArgumentParser(description="Generate population analysis plots")
     parser.add_argument("--plot_type", type=str, default="all",
-                       choices=["training", "projections", "policy", "transition", "all"],
+                       choices=["projections", "policy", "transition", "step_by_step", "all"],
                        help="Type of plot to generate")
     
     args = parser.parse_args()
@@ -583,14 +641,14 @@ def main():
         try:
             plotter = PopulationPlotter(run_dir)
             
-            if args.plot_type == "training":
-                plotter.plot_training_curves(f"{run_dir}/training_curves.png")
-            elif args.plot_type == "projections":
+            if args.plot_type == "projections":
                 plotter.plot_population_projections(f"{run_dir}/population_projections.png")
             elif args.plot_type == "policy":
                 plotter.plot_policy_feature_analysis(f"{run_dir}/policy_analysis.png")
             elif args.plot_type == "transition":
                 plotter.plot_demographic_transition(f"{run_dir}/demographic_transition.png")
+            elif args.plot_type == "step_by_step":
+                plotter.plot_step_by_step_changes(f"{run_dir}/step_by_step_changes.png")
             elif args.plot_type == "all":
                 plotter.create_summary_report(run_dir)
                 

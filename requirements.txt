@@ -9,10 +9,16 @@ matplotlib
 pypdf
 pymupdf4llm
 # Common Requirements
-torch
-numpy
+torch>=1.11.0
+numpy>=1.21.0
 transformers
 datasets
 tiktoken
 wandb
-tqdm
+tqdm>=4.60.0
+# Population Policy Template Requirements
+pandas>=1.3.0
+seaborn>=0.11.0
+requests>=2.25.0
+scikit-learn>=1.0.0
+python-dotenv>=0.19.0

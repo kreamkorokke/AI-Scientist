@@ -1,0 +1,16 @@
+# Population Policy Analysis - Experiment Notes
+
+## Setup
+- Template created for AI-Scientist framework
+- Focus: Japanese population decline and policy interventions
+- Models: Neural Leslie Matrix, Transformer-based forecasting
+- Data sources: e-Stat (Japanese government), UN World Population Prospects
+
+## Experiment Log
+[Experiments will be logged here by AI-Scientist]
+
+## Ideas Implemented
+[Ideas and their outcomes will be tracked here]
+
+## Results Summary
+[Key findings will be summarized here]

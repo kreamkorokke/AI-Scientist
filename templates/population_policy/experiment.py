@@ -1,0 +1,682 @@
+"""
+Pure Mathematical Population Dynamics Modeling and Policy Simulation
+
+This module implements deterministic and stochastic demographic models using
+classical mathematical approaches (Leslie matrices, cohort-component method)
+with policy intervention parameters affecting demographic rates directly.
+"""
+
+import argparse
+import json
+import os
+import pickle
+from typing import Dict, List, Tuple, Optional, Any
+import numpy as np
+import pandas as pd
+from dataclasses import dataclass
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not available, continue without it
+
+from data_pipeline import JapanDemographicDataPipeline
+
+@dataclass
+class DemographicModelConfig:
+    """Configuration for mathematical demographic models."""
+    model_type: str = "leslie_matrix"  # leslie_matrix, cohort_component, stochastic_leslie
+    age_groups: int = 21  # 0-4, 5-9, ..., 95-99, 100+
+    projection_years: int = 50  # Years to project forward
+    time_step: float = 1.0  # Years per time step (1.0 for annual, 0.25 for quarterly)
+    use_stochastic: bool = False  # Add stochastic variation
+    monte_carlo_runs: int = 1000  # Number of MC runs if stochastic
+    policy_sensitivity: float = 1.0  # How strongly policies affect demographic rates
+    
+    # Base demographic parameters (for Japan)
+    base_fertility_rates: List[float] = None  # Age-specific fertility rates
+    base_mortality_rates: List[float] = None  # Age-specific mortality rates  
+    base_migration_rates: List[float] = None  # Age-specific net migration rates
+    
+    def __post_init__(self):
+        if self.base_fertility_rates is None:
+            # Japan fertility rates by 5-year age groups (2020 data approximation)
+            self.base_fertility_rates = [
+                0.000, 0.000, 0.000,  # 0-14 years
+                0.005, 0.055, 0.095, 0.075, 0.025, 0.002,  # 15-49 years
+                0.000, 0.000, 0.000, 0.000, 0.000, 0.000,  # 50+ years  
+                0.000, 0.000, 0.000, 0.000, 0.000, 0.000
+            ]
+        
+        if self.base_mortality_rates is None:
+            # Japan mortality rates by 5-year age groups (deaths per person per year)
+            self.base_mortality_rates = [
+                0.003, 0.0003, 0.0002,  # 0-14 years
+                0.0005, 0.0008, 0.0015, 0.0025, 0.004, 0.007,  # 15-49 years
+                0.012, 0.020, 0.035, 0.055, 0.085, 0.130,  # 50-79 years
+                0.190, 0.260, 0.340, 0.420, 0.500, 0.600   # 80+ years
+            ]
+            
+        if self.base_migration_rates is None:
+            # Japan net migration rates (positive = net immigration)
+            # Currently negative for most age groups due to emigration > immigration
+            self.base_migration_rates = [
+                0.0001, 0.0001, 0.0002,  # 0-14 years
+                0.0005, 0.0008, 0.0003, -0.0002, -0.0005, -0.0003,  # 15-49 years
+                -0.0001, -0.0001, 0.0000, 0.0000, 0.0000, 0.0000,  # 50+ years
+                0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000
+            ]
+
+class PolicyEffectsCalculator:
+    """
+    Maps policy interventions to changes in demographic rates.
+    Based on demographic literature and empirical studies.
+    """
+    
+    def __init__(self, sensitivity: float = 1.0):
+        self.sensitivity = sensitivity
+        
+        # Policy effect matrices: how each policy affects each demographic process
+        # Rows: policies, Columns: age groups (21 groups)
+        # Values: multiplicative effects (1.0 = no change, >1.0 = increase, <1.0 = decrease)
+        
+        # Fertility effects by age group (mainly affects reproductive ages 15-49)
+        self.fertility_effects = {
+            'child_allowance_rate': [0, 0, 0, 1.05, 1.15, 1.20, 1.10, 1.05, 1.02] + [1.0] * 12,
+            'parental_leave_weeks': [0, 0, 0, 1.03, 1.12, 1.18, 1.15, 1.08, 1.03] + [1.0] * 12,
+            'childcare_availability': [0, 0, 0, 1.08, 1.25, 1.30, 1.20, 1.10, 1.05] + [1.0] * 12,
+            'tax_incentive_families': [0, 0, 0, 1.02, 1.08, 1.12, 1.08, 1.03, 1.01] + [1.0] * 12,
+            'work_life_balance_index': [0, 0, 0, 1.04, 1.18, 1.22, 1.15, 1.08, 1.02] + [1.0] * 12,
+            'housing_affordability': [0, 0, 0, 1.06, 1.15, 1.18, 1.12, 1.05, 1.02] + [1.0] * 12,
+            'education_investment': [0, 0, 0, 1.01, 1.05, 1.08, 1.05, 1.02, 1.01] + [1.0] * 12,
+            # These policies have minimal direct fertility effects
+            'immigration_rate': [1.0] * 21,
+            'regional_development_investment': [0, 0, 0, 1.01, 1.03, 1.02, 1.01, 1.0, 1.0] + [1.0] * 12,
+            'elder_care_capacity': [1.0] * 21,
+        }
+        
+        # Mortality effects (mainly affect elderly, some policies affect all ages)
+        self.mortality_effects = {
+            'elder_care_capacity': [1.0] * 10 + [0.95, 0.92, 0.90, 0.88, 0.85, 0.82, 0.80, 0.78, 0.75, 0.72, 0.70],
+            'education_investment': [0.98] * 21,  # Better health awareness
+            'regional_development_investment': [0.99] * 21,  # Better access to healthcare
+            'housing_affordability': [0.99] * 21,  # Better living conditions
+            # Other policies have minimal mortality effects
+            'child_allowance_rate': [1.0] * 21,
+            'parental_leave_weeks': [1.0] * 21,
+            'childcare_availability': [1.0] * 21,
+            'immigration_rate': [1.0] * 21,
+            'tax_incentive_families': [1.0] * 21,
+            'work_life_balance_index': [0.995] * 21,  # Slight health benefit
+        }
+        
+        # Migration effects (immigration policy has large effect, others moderate)
+        self.migration_effects = {
+            'immigration_rate': [1.5, 2.0, 3.0, 5.0, 4.0, 3.0, 2.0, 1.5, 1.2] + [1.1] * 12,
+            'regional_development_investment': [1.1, 1.1, 1.2, 1.3, 1.2, 1.1, 1.0, 1.0, 1.0] + [1.0] * 12,
+            'work_life_balance_index': [1.0, 1.0, 1.05, 1.15, 1.10, 1.05, 1.0, 1.0, 1.0] + [1.0] * 12,
+            'housing_affordability': [1.0, 1.0, 1.03, 1.08, 1.05, 1.02, 1.0, 1.0, 1.0] + [1.0] * 12,
+            'education_investment': [1.0, 1.0, 1.02, 1.05, 1.03, 1.01, 1.0, 1.0, 1.0] + [1.0] * 12,
+            # Other policies have minimal migration effects
+            'child_allowance_rate': [1.0] * 21,
+            'parental_leave_weeks': [1.0] * 21,
+            'childcare_availability': [1.0] * 21,
+            'tax_incentive_families': [1.0] * 21,
+            'elder_care_capacity': [1.0] * 21,
+        }
+    
+    def apply_policy_effects(self, base_fertility: np.ndarray, base_mortality: np.ndarray, 
+                           base_migration: np.ndarray, policy_vector: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Apply policy effects to base demographic rates.
+        
+        Args:
+            base_fertility: Base age-specific fertility rates
+            base_mortality: Base age-specific mortality rates  
+            base_migration: Base age-specific migration rates
+            policy_vector: 10-element policy intervention vector (0-1 scale)
+        
+        Returns:
+            Adjusted fertility, mortality, and migration rates
+        """
+        policy_names = [
+            'child_allowance_rate', 'parental_leave_weeks', 'childcare_availability',
+            'immigration_rate', 'regional_development_investment', 'elder_care_capacity',
+            'tax_incentive_families', 'work_life_balance_index', 'housing_affordability',
+            'education_investment'
+        ]
+        
+        adjusted_fertility = base_fertility.copy()
+        adjusted_mortality = base_mortality.copy()
+        adjusted_migration = base_migration.copy()
+        
+        for i, (policy_name, policy_value) in enumerate(zip(policy_names, policy_vector)):
+            # Policy effect is proportional to policy intensity (0-1) and sensitivity
+            effect_strength = policy_value * self.sensitivity
+            
+            # Apply fertility effects
+            fertility_multipliers = np.array(self.fertility_effects[policy_name])
+            fertility_adjustment = 1.0 + (fertility_multipliers - 1.0) * effect_strength
+            adjusted_fertility *= fertility_adjustment
+            
+            # Apply mortality effects  
+            mortality_multipliers = np.array(self.mortality_effects[policy_name])
+            mortality_adjustment = 1.0 + (mortality_multipliers - 1.0) * effect_strength
+            adjusted_mortality *= mortality_adjustment
+            
+            # Apply migration effects
+            migration_multipliers = np.array(self.migration_effects[policy_name])
+            migration_adjustment = 1.0 + (migration_multipliers - 1.0) * effect_strength
+            adjusted_migration *= migration_adjustment
+        
+        # Ensure rates stay within reasonable bounds
+        adjusted_fertility = np.clip(adjusted_fertility, 0, 0.5)  # Max 50% fertility rate
+        adjusted_mortality = np.clip(adjusted_mortality, 0.0001, 0.8)  # Min survival, max 80% mortality
+        adjusted_migration = np.clip(adjusted_migration, -0.1, 0.1)  # Max 10% migration rate
+        
+        return adjusted_fertility, adjusted_mortality, adjusted_migration
+
+class LeslieMatrixModel:
+    """
+    Pure mathematical Leslie matrix model for age-structured population projection.
+    """
+    
+    def __init__(self, config: DemographicModelConfig):
+        self.config = config
+        self.policy_calculator = PolicyEffectsCalculator(config.policy_sensitivity)
+        
+        # Convert lists to numpy arrays
+        self.base_fertility = np.array(config.base_fertility_rates)
+        self.base_mortality = np.array(config.base_mortality_rates)  
+        self.base_migration = np.array(config.base_migration_rates)
+        
+        # Ensure arrays are correct length
+        if len(self.base_fertility) != config.age_groups:
+            self.base_fertility = np.resize(self.base_fertility, config.age_groups)
+        if len(self.base_mortality) != config.age_groups:
+            self.base_mortality = np.resize(self.base_mortality, config.age_groups)
+        if len(self.base_migration) != config.age_groups:
+            self.base_migration = np.resize(self.base_migration, config.age_groups)
+    
+    def build_leslie_matrix(self, policy_vector: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Build Leslie matrix and migration vector from policy parameters.
+        
+        Returns:
+            Leslie matrix (age_groups x age_groups) and migration vector
+        """
+        # Get policy-adjusted demographic rates
+        fertility, mortality, migration = self.policy_calculator.apply_policy_effects(
+            self.base_fertility, self.base_mortality, self.base_migration, policy_vector
+        )
+        
+        # Calculate survival rates from mortality rates
+        survival = 1.0 - mortality
+        
+        # Build Leslie matrix
+        L = np.zeros((self.config.age_groups, self.config.age_groups))
+        
+        # First row: fertility rates (births)
+        L[0, :] = fertility
+        
+        # Sub-diagonal: survival rates (aging)
+        for i in range(self.config.age_groups - 1):
+            L[i + 1, i] = survival[i]
+        
+        # Last age group: survival within same age group (no aging out)
+        L[-1, -1] = survival[-1]
+        
+        return L, migration
+    
+    def project_population(self, initial_population: np.ndarray, policy_vector: np.ndarray, 
+                          years: int) -> np.ndarray:
+        """
+        Project population forward using Leslie matrix.
+        
+        Args:
+            initial_population: Starting population by age group
+            policy_vector: Policy intervention parameters
+            years: Number of years to project
+        
+        Returns:
+            Population trajectory (years+1 x age_groups)
+        """
+        trajectory = np.zeros((years + 1, self.config.age_groups))
+        trajectory[0] = initial_population.copy()
+        
+        # Build Leslie matrix and migration vector
+        L, migration = self.build_leslie_matrix(policy_vector)
+        
+        for year in range(years):
+            # Leslie matrix projection
+            next_pop = L @ trajectory[year]
+            
+            # Add migration
+            next_pop += migration * trajectory[year]
+            
+            # Ensure non-negative population
+            next_pop = np.maximum(next_pop, 0)
+            
+            trajectory[year + 1] = next_pop
+        
+        return trajectory
+
+class CohortComponentModel:
+    """
+    Cohort-component method for population projection.
+    More detailed than Leslie matrix, tracks births and deaths separately.
+    """
+    
+    def __init__(self, config: DemographicModelConfig):
+        self.config = config
+        self.policy_calculator = PolicyEffectsCalculator(config.policy_sensitivity)
+        
+        # Convert base rates
+        self.base_fertility = np.array(config.base_fertility_rates)
+        self.base_mortality = np.array(config.base_mortality_rates)
+        self.base_migration = np.array(config.base_migration_rates)
+        
+        # Resize if needed
+        if len(self.base_fertility) != config.age_groups:
+            self.base_fertility = np.resize(self.base_fertility, config.age_groups)
+        if len(self.base_mortality) != config.age_groups:
+            self.base_mortality = np.resize(self.base_mortality, config.age_groups)
+        if len(self.base_migration) != config.age_groups:
+            self.base_migration = np.resize(self.base_migration, config.age_groups)
+    
+    def project_population(self, initial_population: np.ndarray, policy_vector: np.ndarray,
+                          years: int) -> Dict[str, np.ndarray]:
+        """
+        Project population using cohort-component method.
+        
+        Returns:
+            Dictionary with population, births, deaths, migrations trajectories
+        """
+        # Get adjusted rates
+        fertility, mortality, migration = self.policy_calculator.apply_policy_effects(
+            self.base_fertility, self.base_mortality, self.base_migration, policy_vector
+        )
+        
+        # Initialize arrays
+        population = np.zeros((years + 1, self.config.age_groups))
+        births = np.zeros(years + 1)
+        deaths = np.zeros((years + 1, self.config.age_groups))
+        migrations = np.zeros((years + 1, self.config.age_groups))
+        
+        population[0] = initial_population.copy()
+        
+        for year in range(years):
+            current_pop = population[year]
+            
+            # Calculate births (from all reproductive age women)
+            births[year + 1] = np.sum(current_pop * fertility)
+            
+            # Calculate deaths by age group
+            deaths[year + 1] = current_pop * mortality
+            
+            # Calculate net migration by age group
+            migrations[year + 1] = current_pop * migration
+            
+            # Update population:
+            # 1. Age everyone by one time step
+            next_pop = np.zeros(self.config.age_groups)
+            
+            # New births go to age group 0
+            next_pop[0] = births[year + 1]
+            
+            # Everyone else ages up (minus deaths)
+            for age in range(self.config.age_groups - 1):
+                survivors = current_pop[age] - deaths[year + 1, age]
+                next_pop[age + 1] += survivors
+            
+            # Oldest age group doesn't age out
+            survivors = current_pop[-1] - deaths[year + 1, -1]
+            next_pop[-1] += survivors
+            
+            # Add migration
+            next_pop += migrations[year + 1]
+            
+            # Ensure non-negative
+            next_pop = np.maximum(next_pop, 0)
+            
+            population[year + 1] = next_pop
+        
+        return {
+            'population': population,
+            'births': births,
+            'deaths': deaths,
+            'migrations': migrations
+        }
+
+class StochasticLeslieModel:
+    """
+    Stochastic Leslie matrix with random variation in demographic rates.
+    """
+    
+    def __init__(self, config: DemographicModelConfig):
+        self.config = config
+        self.leslie_model = LeslieMatrixModel(config)
+        
+        # Stochastic variation parameters (coefficient of variation)
+        self.fertility_cv = 0.1  # 10% CV in fertility rates
+        self.mortality_cv = 0.05  # 5% CV in mortality rates
+        self.migration_cv = 0.2   # 20% CV in migration rates
+    
+    def run_monte_carlo(self, initial_population: np.ndarray, policy_vector: np.ndarray,
+                       years: int, n_runs: int) -> Dict[str, np.ndarray]:
+        """
+        Run Monte Carlo simulation with stochastic demographic rates.
+        
+        Returns:
+            Dictionary with mean, std, percentiles of population trajectories
+        """
+        all_trajectories = []
+        
+        for run in range(n_runs):
+            # Add random variation to policy effects
+            varied_policy = policy_vector + np.random.normal(0, 0.05, len(policy_vector))
+            varied_policy = np.clip(varied_policy, 0, 1)
+            
+            # Project with varied parameters
+            trajectory = self.leslie_model.project_population(
+                initial_population, varied_policy, years
+            )
+            
+            all_trajectories.append(trajectory)
+        
+        all_trajectories = np.array(all_trajectories)  # Shape: (n_runs, years+1, age_groups)
+        
+        return {
+            'mean': np.mean(all_trajectories, axis=0),
+            'std': np.std(all_trajectories, axis=0),
+            'percentile_5': np.percentile(all_trajectories, 5, axis=0),
+            'percentile_25': np.percentile(all_trajectories, 25, axis=0),
+            'percentile_75': np.percentile(all_trajectories, 75, axis=0),
+            'percentile_95': np.percentile(all_trajectories, 95, axis=0),
+            'all_runs': all_trajectories
+        }
+
+class PopulationExperiment:
+    """
+    Main experiment class for mathematical population modeling.
+    """
+    
+    def __init__(self, config: DemographicModelConfig):
+        self.config = config
+        self.data_pipeline = JapanDemographicDataPipeline()
+        
+        # Initialize model based on type
+        if config.model_type == "leslie_matrix":
+            self.model = LeslieMatrixModel(config)
+        elif config.model_type == "cohort_component":
+            self.model = CohortComponentModel(config)
+        elif config.model_type == "stochastic_leslie":
+            self.model = StochasticLeslieModel(config)
+        else:
+            raise ValueError(f"Unknown model type: {config.model_type}")
+        
+        self.results = {}
+    
+    def prepare_initial_population(self) -> np.ndarray:
+        """Prepare initial population vector from data."""
+        # Fetch real demographic data
+        raw_data = self.data_pipeline.get_combined_dataset()
+        processed_data = self.data_pipeline.preprocess_for_modeling(raw_data)
+        
+        # Validate required data is available
+        if 'age_structure' not in processed_data:
+            raise ValueError("Missing 'age_structure' data in processed dataset. Cannot initialize population model.")
+        
+        if processed_data['age_structure'].size == 0:
+            raise ValueError("Empty 'age_structure' data in processed dataset. Cannot initialize population model.")
+        
+        # Use the most recent year's age structure from real data
+        print("Using real UN demographic data for initial population")
+        age_structure = processed_data['age_structure']
+        latest_year_idx = -1  # Most recent year
+        initial_population = age_structure[latest_year_idx]
+        
+        # Ensure we have the right number of age groups
+        if len(initial_population) != self.config.age_groups:
+            # Resize to match model expectations
+            if len(initial_population) > self.config.age_groups:
+                # Aggregate older age groups if we have more than needed
+                resized_pop = list(initial_population[:self.config.age_groups-1])
+                resized_pop.append(initial_population[self.config.age_groups-1:].sum())
+                initial_population = np.array(resized_pop)
+            else:
+                # Pad with zeros if we have fewer
+                padded_pop = list(initial_population)
+                padded_pop.extend([0.0] * (self.config.age_groups - len(initial_population)))
+                initial_population = np.array(padded_pop)
+        
+        # Validate that we have a reasonable population
+        total_population = initial_population.sum()
+        if total_population <= 0:
+            raise ValueError(f"Invalid population data: total population is {total_population}")
+        
+        print(f"Using real data: Total population = {initial_population.sum():.0f}k")
+        print(f"Age structure: 0-14: {initial_population[:3].sum():.0f}k, " +
+              f"15-64: {initial_population[3:13].sum():.0f}k, " +
+              f"65+: {initial_population[13:].sum():.0f}k")
+        
+        return initial_population
+    
+    def generate_policy_scenarios(self) -> Dict[str, np.ndarray]:
+        """Generate different policy scenarios for simulation."""
+        # Baseline (current Japan policies, normalized 0-1)
+        baseline = np.array([0.3, 0.4, 0.2, 0.1, 0.3, 0.3, 0.2, 0.2, 0.1, 0.5])
+        
+        scenarios = {
+            'baseline': baseline,
+            
+            # Pro-natalist policies
+            'pro_natalist': np.clip(baseline + np.array([0.5, 0.5, 0.6, 0.0, 0.0, 0.0, 0.4, 0.4, 0.3, 0.1]), 0, 1),
+            
+            # Immigration-focused
+            'immigration_focused': np.clip(baseline + np.array([0.0, 0.0, 0.1, 0.7, 0.3, 0.0, 0.0, 0.1, 0.0, 0.0]), 0, 1),
+            
+            # Work-life balance
+            'work_life_balance': np.clip(baseline + np.array([0.2, 0.6, 0.4, 0.0, 0.0, 0.0, 0.2, 0.7, 0.1, 0.0]), 0, 1),
+            
+            # Regional development  
+            'regional_development': np.clip(baseline + np.array([0.1, 0.1, 0.2, 0.2, 0.7, 0.1, 0.1, 0.2, 0.4, 0.2]), 0, 1),
+            
+            # Comprehensive intervention
+            'comprehensive': np.clip(baseline + np.array([0.4, 0.4, 0.5, 0.4, 0.4, 0.2, 0.3, 0.5, 0.3, 0.2]), 0, 1),
+            
+            # Elder care focus
+            'elder_care_focus': np.clip(baseline + np.array([0.1, 0.1, 0.1, 0.1, 0.2, 0.7, 0.1, 0.3, 0.2, 0.3]), 0, 1),
+        }
+        
+        return scenarios
+    
+    def run_policy_simulations(self):
+        """Run policy simulations using mathematical models."""
+        print(f"Running {self.config.model_type} simulations...")
+        
+        initial_pop = self.prepare_initial_population()
+        scenarios = self.generate_policy_scenarios()
+        
+        simulation_results = {}
+        
+        for scenario_name, policy_vector in scenarios.items():
+            print(f"Simulating policy: {scenario_name}")
+            
+            if self.config.model_type == "stochastic_leslie":
+                # Run Monte Carlo simulation
+                results = self.model.run_monte_carlo(
+                    initial_pop, policy_vector, self.config.projection_years, 
+                    self.config.monte_carlo_runs
+                )
+                
+                simulation_results[scenario_name] = {
+                    'policy_vector': policy_vector,
+                    'population_mean': results['mean'],
+                    'population_std': results['std'],
+                    'population_p5': results['percentile_5'],
+                    'population_p95': results['percentile_95'],
+                    'total_population_mean': results['mean'].sum(axis=1),
+                    'total_population_std': results['std'].sum(axis=1),
+                }
+                
+            elif self.config.model_type == "cohort_component":
+                # Run detailed cohort-component projection
+                results = self.model.project_population(
+                    initial_pop, policy_vector, self.config.projection_years
+                )
+                
+                simulation_results[scenario_name] = {
+                    'policy_vector': policy_vector,
+                    'population_trajectory': results['population'],
+                    'births_trajectory': results['births'],
+                    'deaths_trajectory': results['deaths'],
+                    'migrations_trajectory': results['migrations'],
+                    'total_population': results['population'].sum(axis=1),
+                    'total_births': results['births'],
+                    'total_deaths': results['deaths'].sum(axis=1),
+                    'total_migrations': results['migrations'].sum(axis=1),
+                }
+                
+            else:  # leslie_matrix
+                # Run standard Leslie matrix projection
+                trajectory = self.model.project_population(
+                    initial_pop, policy_vector, self.config.projection_years
+                )
+                
+                simulation_results[scenario_name] = {
+                    'policy_vector': policy_vector,
+                    'population_trajectory': trajectory,
+                    'total_population': trajectory.sum(axis=1),
+                    'aging_ratio': trajectory[:, 13:].sum(axis=1) / trajectory.sum(axis=1),  # 65+ ratio
+                    'dependency_ratio': ((trajectory[:, :3].sum(axis=1) + trajectory[:, 13:].sum(axis=1)) / 
+                                       trajectory[:, 3:13].sum(axis=1)) * 100,  # (young + old) / working age
+                }
+        
+        self.results['policy_simulations'] = simulation_results
+        self.results['initial_population'] = initial_pop
+        self.results['projection_years'] = self.config.projection_years
+        
+        print("Policy simulations completed!")
+    
+    def calculate_summary_metrics(self):
+        """Calculate summary metrics for policy comparison."""
+        if 'policy_simulations' not in self.results:
+            return
+        
+        simulations = self.results['policy_simulations']
+        summary = {}
+        
+        for scenario_name, data in simulations.items():
+            if 'total_population' in data:
+                total_pop = data['total_population']
+                
+                # Population change metrics
+                initial_pop = total_pop[0]
+                final_pop = total_pop[-1]
+                mid_pop = total_pop[len(total_pop)//2] if len(total_pop) > 20 else total_pop[-1]
+                
+                pop_change_total = (final_pop - initial_pop) / initial_pop * 100
+                pop_change_rate = ((final_pop / initial_pop) ** (1/self.config.projection_years) - 1) * 100
+                
+                # Demographic metrics
+                if 'aging_ratio' in data:
+                    aging_2024 = data['aging_ratio'][0] * 100
+                    aging_final = data['aging_ratio'][-1] * 100
+                    aging_change = aging_final - aging_2024
+                else:
+                    aging_2024 = aging_final = aging_change = 0
+                
+                if 'dependency_ratio' in data:
+                    dependency_final = data['dependency_ratio'][-1]
+                else:
+                    dependency_final = 0
+                
+                summary[scenario_name] = {
+                    'population_change_total_pct': pop_change_total,
+                    'population_change_annual_pct': pop_change_rate,
+                    'aging_ratio_2024_pct': aging_2024,
+                    'aging_ratio_final_pct': aging_final,
+                    'aging_ratio_change_pct': aging_change,
+                    'dependency_ratio_final': dependency_final,
+                    'final_population_millions': final_pop / 1000,
+                }
+        
+        self.results['summary_metrics'] = summary
+    
+    def save_results(self, save_dir: str = "results"):
+        """Save all results to files."""
+        os.makedirs(save_dir, exist_ok=True)
+        
+        # Save main results
+        with open(f"{save_dir}/results.pkl", "wb") as f:
+            pickle.dump(self.results, f)
+        
+        # Save configuration  
+        config_dict = {
+            'model_type': self.config.model_type,
+            'age_groups': self.config.age_groups,
+            'projection_years': self.config.projection_years,
+            'time_step': self.config.time_step,
+            'use_stochastic': self.config.use_stochastic,
+            'monte_carlo_runs': self.config.monte_carlo_runs,
+            'policy_sensitivity': self.config.policy_sensitivity,
+        }
+        
+        with open(f"{save_dir}/config.json", "w") as f:
+            json.dump(config_dict, f, indent=2)
+        
+        # Save summary metrics as CSV
+        if 'summary_metrics' in self.results:
+            summary_df = pd.DataFrame(self.results['summary_metrics']).T
+            summary_df.to_csv(f"{save_dir}/summary_metrics.csv")
+        
+        print(f"Results saved to {save_dir}/")
+
+def main():
+    parser = argparse.ArgumentParser(description="Mathematical Population Dynamics Modeling")
+    parser.add_argument("--model_type", type=str, 
+                       default=os.getenv("DEFAULT_MODEL_TYPE", "leslie_matrix"),
+                       choices=["leslie_matrix", "cohort_component", "stochastic_leslie"])
+    parser.add_argument("--age_groups", type=int, 
+                       default=int(os.getenv("DEFAULT_AGE_GROUPS", "21")))
+    parser.add_argument("--projection_years", type=int, 
+                       default=int(os.getenv("DEFAULT_PROJECTION_YEARS", "50")))
+    parser.add_argument("--time_step", type=float, default=1.0)
+    parser.add_argument("--use_stochastic", action="store_true")
+    parser.add_argument("--monte_carlo_runs", type=int, default=1000)
+    parser.add_argument("--policy_sensitivity", type=float, 
+                       default=float(os.getenv("DEFAULT_POLICY_SENSITIVITY", "1.0")))
+    parser.add_argument("--out_dir", type=str, required=True,
+                       help="Output directory for experimental results (required)")
+    
+    args = parser.parse_args()
+    
+    # Create configuration
+    config = DemographicModelConfig(
+        model_type=args.model_type,
+        age_groups=args.age_groups,
+        projection_years=args.projection_years,
+        time_step=args.time_step,
+        use_stochastic=args.use_stochastic,
+        monte_carlo_runs=args.monte_carlo_runs,
+        policy_sensitivity=args.policy_sensitivity,
+    )
+    
+    # Run experiment
+    experiment = PopulationExperiment(config)
+    
+    # Run simulations
+    experiment.run_policy_simulations()
+    
+    # Calculate summary metrics
+    experiment.calculate_summary_metrics()
+    
+    # Save results
+    experiment.save_results(args.out_dir)
+    
+    print("Mathematical population modeling experiment completed!")
+
+if __name__ == "__main__":
+    main()

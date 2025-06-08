@@ -9,6 +9,60 @@ MAX_ITERS = 4
 MAX_RUNS = 5
 MAX_STDERR_OUTPUT = 1500
 
+def extract_metrics_from_final_info(final_info_data, experiment_dir=None):
+    """
+    Extract metrics from final_info.json, supporting both ML and non-ML templates.
+    
+    Args:
+        final_info_data: Loaded final_info.json data
+        experiment_dir: Optional experiment directory path for template-specific extraction
+        
+    Returns:
+        Dictionary of metrics with numeric values
+    """
+    # Try template-specific extraction if experiment directory is provided
+    if experiment_dir is not None:
+        try:
+            # Get the template base directory (go up from run_X to the template root)
+            base_dir = osp.dirname(experiment_dir)
+            
+            # Try to import the template experiment module
+            sys.path.insert(0, base_dir)
+            import experiment
+            
+            # Check if template has extract_key_metrics_from_results function
+            if hasattr(experiment, 'extract_key_metrics_from_results'):
+                template_metrics = experiment.extract_key_metrics_from_results(experiment_dir)
+                if template_metrics:
+                    sys.path.remove(base_dir)
+                    return template_metrics
+            
+            if base_dir in sys.path:
+                sys.path.remove(base_dir)
+                
+        except Exception as e:
+            print(f"Template-specific extraction failed, falling back to standard format: {e}")
+    
+    # Standard extraction logic
+    if isinstance(final_info_data, dict):
+        # Check if it has the ML format with "means" keys
+        sample_key = next(iter(final_info_data.keys()), None)
+        if sample_key and isinstance(final_info_data[sample_key], dict) and "means" in final_info_data[sample_key]:
+            return {k: v["means"] for k, v in final_info_data.items()}
+        else:
+            # For non-ML templates, flatten nested dictionaries to get numeric values
+            flattened = {}
+            for k, v in final_info_data.items():
+                if isinstance(v, dict):
+                    for sub_k, sub_v in v.items():
+                        if isinstance(sub_v, (int, float)):
+                            flattened[f"{k}_{sub_k}"] = sub_v
+                elif isinstance(v, (int, float)):
+                    flattened[k] = v
+            return flattened
+    
+    return final_info_data if isinstance(final_info_data, dict) else {}
+
 coder_prompt = """Your goal is to implement the following idea: {title}.
 The proposed experiment is as follows: {idea}.
 You are given a total of up to {max_runs} runs to complete the necessary experiments. You do not need to use all {max_runs}.
@@ -60,8 +114,11 @@ def run_experiment(folder_name, run_num, timeout=7200):
             next_prompt = f"Run failed with the following error {stderr_output}"
         else:
             with open(osp.join(cwd, f"run_{run_num}", "final_info.json"), "r") as f:
-                results = json.load(f)
-            results = {k: v["means"] for k, v in results.items()}
+                final_info_data = json.load(f)
+            
+            # Use template-agnostic metric extraction
+            experiment_dir = osp.join(cwd, f"run_{run_num}")
+            results = extract_metrics_from_final_info(final_info_data, experiment_dir)
 
             next_prompt = f"""Run {run_num} completed. Here are the results:
 {results}

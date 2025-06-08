@@ -661,6 +661,99 @@ class PopulationExperiment:
             json.dump(final_info, f, indent=2)
         
         print(f"Generated final_info.json with {len(final_info)} policy scenarios")
+    
+    def get_key_metrics(self) -> Dict[str, float]:
+        """
+        Extract key metrics for AI-Scientist framework analysis.
+        
+        Returns standardized metrics that can be compared across different runs.
+        This method provides a template-agnostic interface for launch_scientist.py.
+        """
+        key_metrics = {}
+        
+        # Extract the most important metrics for tracking experiment success
+        if 'policy_simulations' in self.results:
+            for scenario_name, data in self.results['policy_simulations'].items():
+                if 'total_population' in data and len(data['total_population']) > 0:
+                    initial_pop = data['total_population'][0]
+                    final_pop = data['total_population'][-1]
+                    
+                    # Core demographic metrics for comparison
+                    population_decline_pct = ((final_pop - initial_pop) / initial_pop) * 100
+                    final_aging_ratio = data['aging_ratio'][-1] * 100 if 'aging_ratio' in data else 0
+                    final_dependency_ratio = data['dependency_ratio'][-1] if 'dependency_ratio' in data else 0
+                    
+                    # Policy effectiveness vs baseline
+                    if scenario_name != 'baseline' and 'baseline' in self.results['policy_simulations']:
+                        baseline_final = self.results['policy_simulations']['baseline']['total_population'][-1]
+                        policy_effectiveness = ((final_pop - baseline_final) / baseline_final) * 100
+                    else:
+                        policy_effectiveness = 0.0
+                    
+                    # Store metrics with descriptive names
+                    key_metrics[f"{scenario_name}_population_decline_pct"] = float(population_decline_pct)
+                    key_metrics[f"{scenario_name}_aging_ratio_pct"] = float(final_aging_ratio)
+                    key_metrics[f"{scenario_name}_dependency_ratio"] = float(final_dependency_ratio)
+                    key_metrics[f"{scenario_name}_policy_effectiveness_pct"] = float(policy_effectiveness)
+                    key_metrics[f"{scenario_name}_final_population_millions"] = float(final_pop / 1000)
+        
+        # Add aggregate metrics for overall assessment
+        if 'baseline_population_decline_pct' in key_metrics and 'comprehensive_population_decline_pct' in key_metrics:
+            # How much the best policy reduces decline vs baseline
+            policy_improvement = key_metrics['baseline_population_decline_pct'] - key_metrics['comprehensive_population_decline_pct']
+            key_metrics['best_policy_improvement_pct'] = policy_improvement
+            
+        # Crisis severity indicators
+        if 'baseline_aging_ratio_pct' in key_metrics:
+            key_metrics['demographic_crisis_severity'] = key_metrics['baseline_aging_ratio_pct'] / 100  # 0-1 scale
+            
+        return key_metrics
+
+def extract_key_metrics_from_results(results_dir: str) -> Dict[str, float]:
+    """
+    Helper function for AI-Scientist framework integration.
+    
+    Loads results from a directory and extracts key metrics for comparison.
+    This function provides a standard interface that launch_scientist.py can call.
+    
+    Args:
+        results_dir: Directory containing experimental results
+        
+    Returns:
+        Dictionary of key metrics with standardized names and float values
+    """
+    try:
+        # Load experimental results
+        import pickle
+        results_path = os.path.join(results_dir, "results.pkl")
+        config_path = os.path.join(results_dir, "config.json")
+        
+        if not os.path.exists(results_path) or not os.path.exists(config_path):
+            print(f"Warning: Results files not found in {results_dir}")
+            return {}
+            
+        with open(results_path, "rb") as f:
+            results = pickle.load(f)
+            
+        with open(config_path, "r") as f:
+            config_dict = json.load(f)
+            
+        # Create a temporary config object
+        config = DemographicModelConfig(
+            model_type=config_dict.get('model_type', 'leslie_matrix'),
+            age_groups=config_dict.get('age_groups', 21),
+            projection_years=config_dict.get('projection_years', 30)
+        )
+        
+        # Create temporary experiment instance and extract metrics
+        temp_experiment = PopulationExperiment(config)
+        temp_experiment.results = results
+        
+        return temp_experiment.get_key_metrics()
+        
+    except Exception as e:
+        print(f"Error extracting key metrics from {results_dir}: {e}")
+        return {}
 
 def main():
     parser = argparse.ArgumentParser(description="Mathematical Population Dynamics Modeling")

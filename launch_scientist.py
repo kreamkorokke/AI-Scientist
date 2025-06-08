@@ -26,6 +26,129 @@ def print_time():
     print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 
+def extract_baseline_metrics(base_dir):
+    """
+    Extract baseline metrics from template, supporting both ML and non-ML templates.
+    
+    Args:
+        base_dir: Base directory of the template
+        
+    Returns:
+        Dictionary of baseline metrics for comparison
+    """
+    baseline_results_path = osp.join(base_dir, "run_0", "final_info.json")
+    
+    # First, try to load final_info.json
+    try:
+        with open(baseline_results_path, "r") as f:
+            baseline_results = json.load(f)
+    except FileNotFoundError:
+        print(f"Warning: No baseline results found at {baseline_results_path}")
+        return {}
+    except json.JSONDecodeError as e:
+        print(f"Error parsing baseline results: {e}")
+        return {}
+    
+    # Try to use template-specific key metrics extraction
+    try:
+        # Import the template's experiment module dynamically
+        sys.path.insert(0, base_dir)
+        import experiment
+        
+        # Check if template has extract_key_metrics_from_results function
+        if hasattr(experiment, 'extract_key_metrics_from_results'):
+            run_0_dir = osp.join(base_dir, "run_0")
+            template_metrics = experiment.extract_key_metrics_from_results(run_0_dir)
+            if template_metrics:
+                print(f"Using template-specific metrics: {len(template_metrics)} metrics extracted")
+                return template_metrics
+        
+        sys.path.remove(base_dir)
+        
+    except ImportError as e:
+        print(f"Could not import template experiment module: {e}")
+    except Exception as e:
+        print(f"Error extracting template-specific metrics: {e}")
+    
+    # Fallback to ML-style "means" extraction for existing templates
+    print("Falling back to ML-style means extraction")
+    if isinstance(baseline_results, dict):
+        # Check if it has the ML format with "means" keys
+        sample_key = next(iter(baseline_results.keys()), None)
+        if sample_key and isinstance(baseline_results[sample_key], dict) and "means" in baseline_results[sample_key]:
+            return {k: v["means"] for k, v in baseline_results.items()}
+        else:
+            # For non-ML templates, return the results as-is
+            # Flatten nested dictionaries to get numeric values
+            flattened = {}
+            for k, v in baseline_results.items():
+                if isinstance(v, dict):
+                    for sub_k, sub_v in v.items():
+                        if isinstance(sub_v, (int, float)):
+                            flattened[f"{k}_{sub_k}"] = sub_v
+                elif isinstance(v, (int, float)):
+                    flattened[k] = v
+            return flattened
+    
+    return baseline_results if isinstance(baseline_results, dict) else {}
+
+def extract_experiment_metrics(experiment_dir, base_dir):
+    """
+    Extract metrics from a completed experiment run.
+    
+    Args:
+        experiment_dir: Directory containing the completed experiment
+        base_dir: Template base directory (for importing template-specific functions)
+        
+    Returns:
+        Dictionary of experiment metrics
+    """
+    # Try template-specific extraction first
+    try:
+        sys.path.insert(0, base_dir)
+        import experiment
+        
+        # Check if template has extract_key_metrics_from_results function
+        if hasattr(experiment, 'extract_key_metrics_from_results'):
+            template_metrics = experiment.extract_key_metrics_from_results(experiment_dir)
+            if template_metrics:
+                sys.path.remove(base_dir)
+                return template_metrics
+        
+        sys.path.remove(base_dir)
+        
+    except Exception as e:
+        print(f"Error extracting template-specific metrics from {experiment_dir}: {e}")
+    
+    # Fallback to final_info.json extraction
+    try:
+        final_info_path = osp.join(experiment_dir, "final_info.json")
+        with open(final_info_path, "r") as f:
+            results = json.load(f)
+            
+        # For ML templates with "means" structure
+        if isinstance(results, dict):
+            sample_key = next(iter(results.keys()), None)
+            if sample_key and isinstance(results[sample_key], dict) and "means" in results[sample_key]:
+                return {k: v["means"] for k, v in results.items()}
+            else:
+                # Flatten structure for non-ML templates
+                flattened = {}
+                for k, v in results.items():
+                    if isinstance(v, dict):
+                        for sub_k, sub_v in v.items():
+                            if isinstance(sub_v, (int, float)):
+                                flattened[f"{k}_{sub_k}"] = sub_v
+                    elif isinstance(v, (int, float)):
+                        flattened[k] = v
+                return flattened
+                
+        return results if isinstance(results, dict) else {}
+        
+    except Exception as e:
+        print(f"Error extracting metrics from final_info.json in {experiment_dir}: {e}")
+        return {}
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Run AI scientist experiments")
     parser.add_argument(
@@ -169,11 +292,10 @@ def do_idea(
     assert not osp.exists(folder_name), f"Folder {folder_name} already exists."
     destination_dir = folder_name
     shutil.copytree(base_dir, destination_dir, dirs_exist_ok=True)
-    with open(osp.join(base_dir, "run_0", "final_info.json"), "r") as f:
-        baseline_results = json.load(f)
-    # Check if baseline_results is a dictionary before extracting means
-    if isinstance(baseline_results, dict):
-        baseline_results = {k: v["means"] for k, v in baseline_results.items()}
+    
+    # Extract baseline metrics using template-specific or fallback method
+    baseline_results = extract_baseline_metrics(base_dir)
+    
     exp_file = osp.join(folder_name, "experiment.py")
     vis_file = osp.join(folder_name, "plot.py")
     notes = osp.join(folder_name, "notes.txt")

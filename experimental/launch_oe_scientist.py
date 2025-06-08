@@ -153,9 +153,23 @@ def do_idea(
     assert not osp.exists(folder_name), f"Folder {folder_name} already exists."
     destination_dir = folder_name
     shutil.copytree(base_dir, destination_dir, dirs_exist_ok=True)
-    with open(osp.join(base_dir, "run_0", "final_info.json"), "r") as f:
-        baseline_results = json.load(f)
-    baseline_results = {k: v["means"] for k, v in baseline_results.items()}
+    # Extract baseline metrics using template-agnostic method
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
+    try:
+        from launch_scientist import extract_baseline_metrics
+        baseline_results = extract_baseline_metrics(base_dir)
+    except ImportError:
+        # Fallback to ML-style extraction if import fails
+        with open(osp.join(base_dir, "run_0", "final_info.json"), "r") as f:
+            baseline_data = json.load(f)
+        if isinstance(baseline_data, dict):
+            sample_key = next(iter(baseline_data.keys()), None)
+            if sample_key and isinstance(baseline_data[sample_key], dict) and "means" in baseline_data[sample_key]:
+                baseline_results = {k: v["means"] for k, v in baseline_data.items()}
+            else:
+                baseline_results = baseline_data
+        else:
+            baseline_results = baseline_data
     exp_file = osp.join(folder_name, "experiment.py")
     vis_file = osp.join(folder_name, "plot.py")
     notes = osp.join(folder_name, "notes.txt")

@@ -170,5 +170,6 @@ data/
 *.zip
 ICLR2022-OpenReviewData/
 templates/*/run_0/
+templates/*/run*/
 templates/*/*.png
 results/*

@@ -41,21 +41,23 @@ class DemographicModelConfig:
     
     def __post_init__(self):
         if self.base_fertility_rates is None:
-            # Japan fertility rates by 5-year age groups (2020 data approximation)
+            # Japan fertility rates by 5-year age groups (UN World Population Prospects 2024)
+            # Calibrated to Total Fertility Rate = 1.217 children per woman
             self.base_fertility_rates = [
-                0.000, 0.000, 0.000,  # 0-14 years
-                0.005, 0.055, 0.095, 0.075, 0.025, 0.002,  # 15-49 years
-                0.000, 0.000, 0.000, 0.000, 0.000, 0.000,  # 50+ years  
-                0.000, 0.000, 0.000, 0.000, 0.000, 0.000
+                0.0000, 0.0000, 0.0000,  # 0-14 years
+                0.0024, 0.0122, 0.0438, 0.0779, 0.0682, 0.0365,  # 15-44 years
+                0.0017, 0.0005, 0.0002,  # 45-59 years
+                0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000  # 60+ years
             ]
         
         if self.base_mortality_rates is None:
-            # Japan mortality rates by 5-year age groups (deaths per person per year)
+            # Japan mortality rates by 5-year age groups (UN World Population Prospects 2024)
+            # Calibrated to Life Expectancy = 84.9 years (annual death rates)
             self.base_mortality_rates = [
-                0.003, 0.0003, 0.0002,  # 0-14 years
-                0.0005, 0.0008, 0.0015, 0.0025, 0.004, 0.007,  # 15-49 years
-                0.012, 0.020, 0.035, 0.055, 0.085, 0.130,  # 50-79 years
-                0.190, 0.260, 0.340, 0.420, 0.500, 0.600   # 80+ years
+                0.0006, 0.0001, 0.0001,  # 0-14 years
+                0.0001, 0.0002, 0.0002, 0.0003, 0.0005, 0.0008,  # 15-44 years
+                0.0015, 0.0025, 0.0040, 0.0065, 0.0105, 0.0170,  # 45-74 years
+                0.0290, 0.0480, 0.0800, 0.1350, 0.2200  # 75+ years
             ]
             
         if self.base_migration_rates is None:

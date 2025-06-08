@@ -28,7 +28,7 @@ class DemographicModelConfig:
     """Configuration for mathematical demographic models."""
     model_type: str = "leslie_matrix"  # leslie_matrix, cohort_component, stochastic_leslie
     age_groups: int = 21  # 0-4, 5-9, ..., 95-99, 100+
-    projection_years: int = 50  # Years to project forward
+    projection_years: int = 30  # Years to project forward
     time_step: float = 1.0  # Years per time step (1.0 for annual, 0.25 for quarterly)
     use_stochastic: bool = False  # Add stochastic variation
     monte_carlo_runs: int = 1000  # Number of MC runs if stochastic
@@ -709,7 +709,7 @@ def main():
     parser.add_argument("--age_groups", type=int, 
                        default=int(os.getenv("DEFAULT_AGE_GROUPS", "21")))
     parser.add_argument("--projection_years", type=int, 
-                       default=int(os.getenv("DEFAULT_PROJECTION_YEARS", "50")))
+                       default=int(os.getenv("DEFAULT_PROJECTION_YEARS", "30")))
     parser.add_argument("--time_step", type=float, default=1.0)
     parser.add_argument("--use_stochastic", action="store_true")
     parser.add_argument("--monte_carlo_runs", type=int, default=1000)

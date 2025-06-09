@@ -1,0 +1,9 @@
+{
+  "model_type": "stochastic_leslie",
+  "age_groups": 21,
+  "projection_years": 30,
+  "time_step": 1.0,
+  "use_stochastic": false,
+  "monte_carlo_runs": 1000,
+  "policy_sensitivity": 1.0
+}

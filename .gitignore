@@ -173,3 +173,6 @@ templates/*/run_0/
 templates/*/run*/
 templates/*/*.png
 results/*
+
+# Skip uploading large pickle files
+*.pkl

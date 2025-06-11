@@ -1,13 +1,5 @@
 [
   {
-    "Name": "multi_objective_crisis_optimization",
-    "Title": "Multi-Objective Policy Optimization for Japan's Demographic Crisis Resolution",
-    "Experiment": "We formulate Japan's population crisis as a multi-objective optimization problem balancing three critical dimensions: (1) reversing population decline (target: positive growth by 2040), (2) maintaining economic sustainability (dependency ratio <80), and (3) preserving social equity (regional population balance). Using mathematical Leslie matrix projections, we systematically explore the 10-dimensional policy space to identify Pareto-optimal intervention combinations. We test breakthrough scenarios including 'demographic moonshot' policies (e.g., universal childcare + 50% immigration increase + rural revitalization) against conventional incremental approaches. The experiment validates which policy combinations can realistically achieve population stabilization while quantifying trade-offs between economic costs and demographic benefits.",
-    "Interestingness": 9,
-    "Feasibility": 8,
-    "Novelty": 8
-  },
-  {
     "Name": "critical_window_interventions",
     "Title": "Critical Window Analysis for Emergency Demographic Interventions",
     "Experiment": "Japan faces a rapidly closing window for demographic intervention before population decline becomes irreversible. We use mathematical population models to identify critical intervention windows where policy timing dramatically affects long-term outcomes. We test the hypothesis that 'emergency demographic protocols' implemented within the next 5-10 years could prevent catastrophic population collapse, while delayed interventions (post-2030) may be insufficient regardless of intensity. Using cohort-component projections, we simulate time-sensitive policy sequences (e.g., immediate fertility incentives → targeted immigration → sustained support) and compare early vs. late intervention scenarios. The experiment quantifies the demographic and economic costs of policy delay, providing evidence for urgent vs. gradual response strategies.",

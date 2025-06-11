@@ -1,0 +1,18 @@
+{
+  "baseline": {
+    "population_decline_pct": -31.991853029760154,
+    "annual_decline_rate": -1.276919574248525,
+    "final_aging_ratio_pct": 98.84102588328342,
+    "final_dependency_ratio": 9335.465634358847,
+    "policy_effectiveness_pct": 0.0,
+    "final_population_millions": 83.72039492379854
+  },
+  "emergency_protocol": {
+    "population_decline_pct": -6.391162378997225,
+    "annual_decline_rate": -0.21990913788902944,
+    "final_aging_ratio_pct": 93.94844376636473,
+    "final_dependency_ratio": 1801.951720011125,
+    "policy_effectiveness_pct": 37.643564471717944,
+    "final_population_millions": 115.23573576291551
+  }
+}

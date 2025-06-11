@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: template.aux
+The style file: iclr2024_conference.bst
+Database file #1: references.bib
+Repeated entry---line 200 of file references.bib
+ : @article{Malafeyev2024ModelingAD
+ :                                 ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 210 of file references.bib
+ : @article{Vindenes2021IntroductionTM
+ :                                    ,
+I'm skipping whatever remains of this entry
+You've used 15 entries,
+            2773 wiz_defined-function locations,
+            695 strings with 8568 characters,
+and the built_in function-call counts, 8111 in all, are:
+= -- 673
+> -- 627
+< -- 9
++ -- 207
+- -- 192
+* -- 712
+:= -- 1285
+add.period$ -- 50
+call.type$ -- 15
+change.case$ -- 104
+chr.to.int$ -- 15
+cite$ -- 30
+duplicate$ -- 341
+empty$ -- 568
+format.name$ -- 213
+if$ -- 1676
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 16
+newline$ -- 85
+num.names$ -- 66
+pop$ -- 205
+preamble$ -- 1
+purify$ -- 90
+quote$ -- 0
+skip$ -- 278
+stack$ -- 0
+substring$ -- 174
+swap$ -- 46
+text.length$ -- 6
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 160
+warning$ -- 0
+while$ -- 59
+width$ -- 0
+write$ -- 206
+(There were 2 error messages)

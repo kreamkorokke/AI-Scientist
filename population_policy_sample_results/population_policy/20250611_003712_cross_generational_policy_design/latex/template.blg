@@ -1,0 +1,59 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: template.aux
+The style file: iclr2024_conference.bst
+Database file #1: references.bib
+Repeated entry---line 196 of file references.bib
+ : @article{Elderd2015QuantifyingDU
+ :                                 ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 206 of file references.bib
+ : @article{Alkema2015TheUN
+ :                         ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 219 of file references.bib
+ : @article{Alkema2015TheUN
+ :                         ,
+I'm skipping whatever remains of this entry
+You've used 16 entries,
+            2773 wiz_defined-function locations,
+            697 strings with 8627 characters,
+and the built_in function-call counts, 8453 in all, are:
+= -- 695
+> -- 675
+< -- 8
++ -- 225
+- -- 209
+* -- 741
+:= -- 1363
+add.period$ -- 50
+call.type$ -- 16
+change.case$ -- 116
+chr.to.int$ -- 16
+cite$ -- 32
+duplicate$ -- 329
+empty$ -- 584
+format.name$ -- 237
+if$ -- 1725
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 16
+newline$ -- 89
+num.names$ -- 66
+pop$ -- 212
+preamble$ -- 1
+purify$ -- 100
+quote$ -- 0
+skip$ -- 275
+stack$ -- 0
+substring$ -- 204
+swap$ -- 19
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 176
+warning$ -- 0
+while$ -- 58
+width$ -- 0
+write$ -- 213
+(There were 3 error messages)

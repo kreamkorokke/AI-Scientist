@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: template.aux
+The style file: iclr2024_conference.bst
+Database file #1: references.bib
+Warning--empty booktitle in ho2020StochasticPP
+Warning--empty booktitle in Smith2001StateAL
+You've used 11 entries,
+            2773 wiz_defined-function locations,
+            669 strings with 7184 characters,
+and the built_in function-call counts, 5150 in all, are:
+= -- 431
+> -- 344
+< -- 6
++ -- 116
+- -- 105
+* -- 416
+:= -- 812
+add.period$ -- 33
+call.type$ -- 11
+change.case$ -- 68
+chr.to.int$ -- 11
+cite$ -- 24
+duplicate$ -- 235
+empty$ -- 399
+format.name$ -- 120
+if$ -- 1069
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 11
+newline$ -- 63
+num.names$ -- 44
+pop$ -- 134
+preamble$ -- 1
+purify$ -- 57
+quote$ -- 0
+skip$ -- 187
+stack$ -- 0
+substring$ -- 122
+swap$ -- 21
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 121
+warning$ -- 2
+while$ -- 39
+width$ -- 0
+write$ -- 144
+(There were 2 warnings)

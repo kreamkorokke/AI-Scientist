@@ -1,0 +1,74 @@
+{
+  "baseline": {
+    "population_decline_pct": -31.97233575977932,
+    "annual_decline_rate": -1.27597530610577,
+    "final_aging_ratio_pct": 98.84245424547399,
+    "final_dependency_ratio": 9346.882912732128,
+    "policy_effectiveness_pct": 0.0,
+    "final_population_millions": 83.74442136215076
+  },
+  "housing_tax_30_70": {
+    "population_decline_pct": -36.416937345033304,
+    "annual_decline_rate": -1.4980757090539365,
+    "final_aging_ratio_pct": 99.09438965509409,
+    "final_dependency_ratio": 11895.867914071097,
+    "policy_effectiveness_pct": -6.533520788776627,
+    "final_population_millions": 78.27296218301395
+  },
+  "housing_tax_50_50": {
+    "population_decline_pct": -36.25857906458071,
+    "annual_decline_rate": -1.4899079947441773,
+    "final_aging_ratio_pct": 99.077287984295,
+    "final_dependency_ratio": 11678.664550295438,
+    "policy_effectiveness_pct": -6.300735667868473,
+    "final_population_millions": 78.46790673553566
+  },
+  "housing_tax_70_30": {
+    "population_decline_pct": -36.09321800616723,
+    "annual_decline_rate": -1.4814000041615483,
+    "final_aging_ratio_pct": 99.06218258037329,
+    "final_dependency_ratio": 11493.55191854524,
+    "policy_effectiveness_pct": -6.057656531960534,
+    "final_population_millions": 78.6714719513539
+  },
+  "immigration_focused": {
+    "population_decline_pct": -30.34282948615214,
+    "annual_decline_rate": -1.198047374462985,
+    "final_aging_ratio_pct": 98.57390527735079,
+    "final_dependency_ratio": 7588.370740674822,
+    "policy_effectiveness_pct": 2.3953582587710733,
+    "final_population_millions": 85.7504002755091
+  },
+  "work_life_balance": {
+    "population_decline_pct": -27.487533553756432,
+    "annual_decline_rate": -1.0656535413981372,
+    "final_aging_ratio_pct": 97.52627839178531,
+    "final_dependency_ratio": 4412.787148733242,
+    "policy_effectiveness_pct": 6.592615307481477,
+    "final_population_millions": 89.2653689040337
+  },
+  "regional_development": {
+    "population_decline_pct": -27.915658273459858,
+    "annual_decline_rate": -1.0851801056893096,
+    "final_aging_ratio_pct": 98.22455901519648,
+    "final_dependency_ratio": 6124.127748282749,
+    "policy_effectiveness_pct": 5.9632761636419565,
+    "final_population_millions": 88.73833247961979
+  },
+  "comprehensive": {
+    "population_decline_pct": -23.419431737009436,
+    "annual_decline_rate": -0.8854790681373181,
+    "final_aging_ratio_pct": 97.18130827811044,
+    "final_dependency_ratio": 3872.8992453336446,
+    "policy_effectiveness_pct": 12.572685124933432,
+    "final_population_millions": 94.27334376971147
+  },
+  "elder_care_focus": {
+    "population_decline_pct": -22.59749568816866,
+    "annual_decline_rate": -0.8502020007240652,
+    "final_aging_ratio_pct": 98.51014264135607,
+    "final_dependency_ratio": 7302.359530896635,
+    "policy_effectiveness_pct": 13.780923064631518,
+    "final_population_millions": 95.2851756409896
+  }
+}

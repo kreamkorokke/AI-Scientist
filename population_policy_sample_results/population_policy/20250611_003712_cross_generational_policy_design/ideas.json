@@ -1,0 +1,38 @@
+[
+    {
+        "Name": "critical_window_interventions",
+        "Title": "Critical Window Analysis for Emergency Demographic Interventions",
+        "Experiment": "Japan faces a rapidly closing window for demographic intervention before population decline becomes irreversible. We use mathematical population models to identify critical intervention windows where policy timing dramatically affects long-term outcomes. We test the hypothesis that 'emergency demographic protocols' implemented within the next 5-10 years could prevent catastrophic population collapse, while delayed interventions (post-2030) may be insufficient regardless of intensity. Using cohort-component projections, we simulate time-sensitive policy sequences (e.g., immediate fertility incentives \u2192 targeted immigration \u2192 sustained support) and compare early vs. late intervention scenarios. The experiment quantifies the demographic and economic costs of policy delay, providing evidence for urgent vs. gradual response strategies.",
+        "Interestingness": 9,
+        "Feasibility": 9,
+        "Novelty": 7,
+        "novel": true
+    },
+    {
+        "Name": "cross_generational_policy_design",
+        "Title": "Cross-Generational Policy Architecture for Ultra-Aging Society Management",
+        "Experiment": "With Japan's unprecedented 30% elderly population, we explore novel cross-generational policy designs that simultaneously address the needs of shrinking youth cohorts and expanding elderly populations. We develop age-structured policy models where interventions target multiple generations simultaneously (e.g., 'three-generation housing incentives', 'elder-to-youth skill transfer programs', 'intergenerational economic partnerships'). Using Leslie matrix analysis, we test whether cross-generational approaches can achieve superior demographic outcomes compared to age-segregated policies. We compare conventional single-target policies (youth fertility support OR elder care) against integrated multi-generational interventions, measuring population stabilization, economic efficiency, and social cohesion outcomes over 50-year projections.",
+        "Interestingness": 8,
+        "Feasibility": 8,
+        "Novelty": 9,
+        "novel": true
+    },
+    {
+        "Name": "regional_demographic_clusters",
+        "Title": "Strategic Regional Clustering for Demographic Revitalization",
+        "Experiment": "We analyze the effectiveness of geographically concentrated vs dispersed demographic interventions using a two-tier regional model. Using the Leslie matrix framework, we compare three scenarios: (1) Uniform national policy distribution, (2) Concentrated investment in high-potential regions (30% of areas receiving 70% of resources), and (3) Extreme concentration (10% regions, 90% resources). For each scenario, we model population dynamics over 30 years using different policy portfolios (fertility, immigration, economic). Key metrics include national population trajectory, regional demographic disparities, and resource efficiency. The experiment tests whether concentrated regional investment could achieve better outcomes than uniform intervention while requiring fewer total resources.",
+        "Interestingness": 8,
+        "Feasibility": 9,
+        "Novelty": 8,
+        "novel": true
+    },
+    {
+        "Name": "policy_interaction_optimization",
+        "Title": "Resource-Constrained Policy Portfolio Optimization through Key Interaction Analysis",
+        "Experiment": "We analyze interaction effects between critical demographic policy pairs under budget constraints. Using the Leslie matrix framework, we first identify the 4-5 most impactful policies from baseline simulations. We then systematically test these key policy combinations under different resource allocation scenarios (fixed total budget), running stochastic projections to measure interaction effects. The analysis focuses on: (1) Child allowance + childcare availability, (2) Immigration + regional development, (3) Work-life balance + parental leave, and (4) Housing + tax incentives. For each pair, we calculate complementarity scores showing how policies enhance or diminish each other's effects per unit cost. This provides concrete guidance for optimal resource allocation across synergistic policy portfolios.",
+        "Interestingness": 9,
+        "Feasibility": 9,
+        "Novelty": 8,
+        "novel": true
+    }
+]

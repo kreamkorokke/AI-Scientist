@@ -1,0 +1,18 @@
+{
+  "baseline": {
+    "population_decline_pct": -31.98627981949721,
+    "annual_decline_rate": -1.2766499091580008,
+    "final_aging_ratio_pct": 98.84385902354666,
+    "final_dependency_ratio": 9358.085270997042,
+    "policy_effectiveness_pct": 0.0,
+    "final_population_millions": 83.72725573952421
+  },
+  "early_intervention": {
+    "population_decline_pct": -21.869103813120734,
+    "annual_decline_rate": -0.8192411437223046,
+    "final_aging_ratio_pct": 97.36841675241958,
+    "final_dependency_ratio": 4121.614551376851,
+    "policy_effectiveness_pct": 14.875198679805093,
+    "final_population_millions": 96.18185137992694
+  }
+}

@@ -1,0 +1,87 @@
+# Title: Resource-Constrained Policy Portfolio Optimization through Key Interaction Analysis
+# Experiment description: We analyze interaction effects between critical demographic policy pairs under budget constraints. Using the Leslie matrix framework, we first identify the 4-5 most impactful policies from baseline simulations. We then systematically test these key policy combinations under different resource allocation scenarios (fixed total budget), running stochastic projections to measure interaction effects. The analysis focuses on: (1) Child allowance + childcare availability, (2) Immigration + regional development, (3) Work-life balance + parental leave, and (4) Housing + tax incentives. For each pair, we calculate complementarity scores showing how policies enhance or diminish each other's effects per unit cost. This provides concrete guidance for optimal resource allocation across synergistic policy portfolios.
+
+# Visualization Descriptions
+
+## population_projections.png
+This figure contains four key visualizations:
+1. Population Projections by Policy Scenario: Shows total population trajectories under different policy combinations from 2024-2054, with baseline and comprehensive scenarios highlighted. Demonstrates the long-term population impacts of each policy pair.
+2. Population Aging (65+ %) by Policy Scenario: Tracks the aging ratio (percentage of population 65+) over time for each policy combination, revealing how different interventions affect demographic structure.
+3. Population Change by 2050: Bar chart comparing the total population change (%) between 2024-2050 across all scenarios, with color-coding indicating relative performance.
+4. Age Structure Evolution: Population pyramid comparison showing age distribution changes between 2024, 2039, and 2054 under the comprehensive policy scenario.
+
+## policy_analysis.png
+This visualization analyzes policy features and their impacts through four panels:
+1. Policy Feature Intensities: Heatmap showing the intensity (0-1) of each policy component across different scenarios, revealing policy mix patterns.
+2. Policy Effectiveness vs Baseline: Bar chart comparing how each policy combination performs relative to the baseline scenario.
+3. Policy Feature Importance: Correlation analysis showing which policy components have the strongest relationship with positive population outcomes.
+4. Policy Profile Comparison: Radar chart comparing the policy mix profiles of the most distinctive scenarios (Comprehensive, Pro-Natalist, Immigration Focused).
+
+## step_by_step_changes.png
+This figure tracks detailed demographic changes through four perspectives:
+1. Year-over-Year Population Growth Rates: Shows annual population growth rates for each policy scenario, highlighting immediate vs delayed effects.
+2. Population Age Composition: Stacked area chart showing the evolution of age group proportions (0-14, 15-64, 65+) over time.
+3. Population by Age Group: Tracks absolute population numbers in each major age group, showing which demographics are most affected.
+4. Policy Impact Over Time: Shows how the effectiveness of each policy combination evolves relative to the baseline over the projection period.
+
+## demographic_transition.png
+This visualization focuses on demographic structural changes:
+1. Total Dependency Ratio Evolution: Shows how the ratio of dependent population (young + elderly) to working-age population changes under different policies.
+2. Working Age Population Evolution: Tracks the size of the working-age population (15-64) across scenarios.
+3. Population Pyramid Comparison: Contrasts age-sex population structures between 2024 and 2050 under the baseline scenario.
+4. Policy Impact Summary Table: Comprehensive table showing key demographic indicators for each policy scenario by 2050.
+
+## uncertainty_analysis.png
+This figure examines the uncertainty in projections through four panels:
+1. Population Uncertainty Bands: Shows 50% and 90% confidence intervals for population projections under baseline and comprehensive scenarios.
+2. Aging Ratio Uncertainty: Displays uncertainty ranges in the aging ratio projections across key scenarios.
+3. Policy Effectiveness with Uncertainty: Shows how confident we can be about the relative effectiveness of different policy combinations.
+4. Projection Uncertainty Over Time: Tracks how uncertainty in population projections grows over the simulation period.
+
+## Run 0: Baseline
+Results: {'baseline_population_decline_pct': -31.99288982244609, 'baseline_aging_ratio_pct': 98.84364637852168, 'baseline_dependency_ratio': 9356.467414432298, 'baseline_policy_effectiveness_pct': 0.0, 'baseline_final_population_millions': 83.71911859593213, 'pro_natalist_population_decline_pct': -26.18137545375126, 'pro_natalist_aging_ratio_pct': 97.10252613078464, 'pro_natalist_dependency_ratio': 3772.1462770838, 'pro_natalist_policy_effectiveness_pct': 8.545451135215202, 'pro_natalist_final_population_millions': 90.87329496638037, 'immigration_focused_population_decline_pct': -30.352655069163383, 'immigration_focused_aging_ratio_pct': 98.57340524401704, 'immigration_focused_dependency_ratio': 7585.6662877594445, 'immigration_focused_policy_effectiveness_pct': 2.4118577439922992, 'immigration_focused_final_population_millions': 85.73830464099022, 'work_life_balance_population_decline_pct': -27.540782134874554, 'work_life_balance_aging_ratio_pct': 97.53303319043617, 'work_life_balance_dependency_ratio': 4424.771289928787, 'work_life_balance_policy_effectiveness_pct': 6.546532672757175, 'work_life_balance_final_population_millions': 89.19981804815916, 'regional_development_population_decline_pct': -27.905184104690363, 'regional_development_aging_ratio_pct': 98.22353734706715, 'regional_development_dependency_ratio': 6120.649500599236, 'regional_development_policy_effectiveness_pct': 6.010703450100277, 'regional_development_final_population_millions': 88.75122654577136, 'comprehensive_population_decline_pct': -23.389818960598216, 'comprehensive_aging_ratio_pct': 97.17044327025846, 'comprehensive_dependency_ratio': 3858.124025540826, 'comprehensive_policy_effectiveness_pct': 12.650252068330591, 'comprehensive_final_population_millions': 94.30979812770218, 'elder_care_focus_population_decline_pct': -22.592768048415994, 'elder_care_focus_aging_ratio_pct': 98.50575234587549, 'elder_care_focus_dependency_ratio': 7281.3144400904475, 'elder_care_focus_policy_effectiveness_pct': 13.822263215549269, 'elder_care_focus_final_population_millions': 95.29099552999972, 'best_policy_improvement_pct': -8.603070861847876, 'demographic_crisis_severity': 0.9884364637852169}
+Description: Baseline results showing the effectiveness of different policy approaches. Elder care focus and comprehensive policies showed the strongest positive effects, while immigration-focused policies had limited impact.
+
+## Run 1: Child Allowance + Childcare Availability Analysis
+Results: {'baseline_population_decline_pct': -31.981209931972455, 'baseline_aging_ratio_pct': 98.84474804350684, 'baseline_dependency_ratio': 9365.203784655994, 'baseline_policy_effectiveness_pct': 0.0, 'baseline_final_population_millions': 83.73349694744857, 'child_care_30_70_population_decline_pct': -35.795805673705914, 'child_care_30_70_aging_ratio_pct': 98.90134085539634, 'child_care_30_70_dependency_ratio': 9832.451640142019, 'child_care_30_70_policy_effectiveness_pct': -5.608149950797964, 'child_care_30_70_final_population_millions': 79.03759687958882, 'child_care_50_50_population_decline_pct': -35.92389066910945, 'child_care_50_50_aging_ratio_pct': 98.9384171146695, 'child_care_50_50_dependency_ratio': 10170.739912069968, 'child_care_50_50_policy_effectiveness_pct': -5.796458203966594, 'child_care_50_50_final_population_millions': 78.87991979417006, 'child_care_70_30_population_decline_pct': -36.093127245677145, 'child_care_70_30_aging_ratio_pct': 98.9831415574164, 'child_care_70_30_dependency_ratio': 10611.361854853807, 'child_care_70_30_policy_effectiveness_pct': -6.045266770538324, 'child_care_70_30_final_population_millions': 78.67158368067474}
+Description: Analysis of child allowance and childcare availability policy pair with different budget allocations (30-70, 50-50, 70-30 splits). Key findings:
+1. All tested combinations performed worse than baseline, with population declines of ~36% vs baseline ~32%
+2. Higher child allowance ratios (70-30 split) showed worst performance (-36.09% decline)
+3. Increased dependency ratios across all combinations
+4. Negative policy effectiveness scores (-5.6% to -6.0%)
+5. Suggests these policies may have negative interaction effects when implemented in isolation
+6. Results indicate need for complementary supporting policies rather than focusing solely on direct financial support and childcare
+
+## Run 2: Immigration + Regional Development Analysis
+Results: {'baseline_population_decline_pct': -31.993474453782728, 'baseline_aging_ratio_pct': 98.84596742313938, 'baseline_dependency_ratio': 9374.986090052858, 'baseline_policy_effectiveness_pct': 0.0, 'baseline_final_population_millions': 83.7183988944174, 'immig_reg_30_70_population_decline_pct': -36.47100271234135, 'immig_reg_30_70_aging_ratio_pct': 99.20269255906064, 'immig_reg_30_70_dependency_ratio': 13474.380722702572, 'immig_reg_30_70_policy_effectiveness_pct': -6.58396855683458, 'immig_reg_30_70_final_population_millions': 78.20640583492361, 'immig_reg_50_50_population_decline_pct': -36.35915166554471, 'immig_reg_50_50_aging_ratio_pct': 99.18229394045474, 'immig_reg_50_50_dependency_ratio': 13135.171509739772, 'immig_reg_50_50_policy_effectiveness_pct': -6.419497506595986, 'immig_reg_50_50_final_population_millions': 78.3440983648282, 'immig_reg_70_30_population_decline_pct': -36.2609799628081, 'immig_reg_70_30_aging_ratio_pct': 99.16098306898408, 'immig_reg_70_30_dependency_ratio': 12799.112113344456, 'immig_reg_70_30_policy_effectiveness_pct': -6.275141208508246, 'immig_reg_70_30_final_population_millions': 78.4649511462905}
+Description: Analysis of immigration and regional development policy pair with different budget allocations (30-70, 50-50, 70-30 splits). Key findings:
+1. All combinations performed worse than baseline, with population declines of ~36% vs baseline ~32%
+2. Higher immigration ratios (70-30 split) performed slightly better (-36.26% decline) than lower ratios
+3. All combinations led to increased aging ratios and significantly higher dependency ratios
+4. Negative policy effectiveness scores (-6.27% to -6.58%)
+5. Results suggest these policies may have competing effects when implemented together
+6. Immigration appears more effective than regional development for population outcomes
+7. The high dependency ratios indicate potential sustainability challenges with this policy mix
+
+## Run 3: Work-Life Balance + Parental Leave Analysis
+Results: {'baseline_population_decline_pct': -31.9909125185807, 'baseline_aging_ratio_pct': 98.84404239278994, 'baseline_dependency_ratio': 9359.614800722124, 'baseline_policy_effectiveness_pct': 0.0, 'baseline_final_population_millions': 83.72155272578082, 'work_leave_30_70_population_decline_pct': -35.9958917270043, 'work_leave_30_70_aging_ratio_pct': 98.97304688561704, 'work_leave_30_70_dependency_ratio': 10510.459189940415, 'work_leave_30_70_policy_effectiveness_pct': -5.888888318811502, 'work_leave_30_70_final_population_millions': 78.79128398698471, 'work_leave_50_50_population_decline_pct': -35.940577040404584, 'work_leave_50_50_aging_ratio_pct': 98.96725815075504, 'work_leave_50_50_dependency_ratio': 10451.97375665541, 'work_leave_50_50_policy_effectiveness_pct': -5.807554060923062, 'work_leave_50_50_final_population_millions': 78.8593782905869, 'work_leave_70_30_population_decline_pct': -35.890523191055344, 'work_leave_70_30_aging_ratio_pct': 98.9675970051447, 'work_leave_70_30_dependency_ratio': 10455.036672820874, 'work_leave_70_30_policy_effectiveness_pct': -5.733955294636254, 'work_leave_70_30_final_population_millions': 78.92099632050923}
+Description: Analysis of work-life balance and parental leave policy pair with different budget allocations (30-70, 50-50, 70-30 splits). Key findings:
+1. All combinations performed worse than baseline, with population declines of ~36% vs baseline ~32%
+2. Higher work-life balance ratios (70-30 split) performed marginally better (-35.89% decline)
+3. Relatively consistent dependency ratios across allocations (~10,450-10,510)
+4. Negative policy effectiveness scores (-5.73% to -5.89%)
+5. Results suggest these policies may need broader support systems to be effective
+6. Work-life balance appears slightly more effective than parental leave when implemented in isolation
+7. More moderate aging ratio increases compared to previous policy pairs
+
+## Run 4: Housing + Tax Incentives Analysis
+Results: {'baseline_population_decline_pct': -31.97233575977932, 'baseline_aging_ratio_pct': 98.84245424547399, 'baseline_dependency_ratio': 9346.882912732128, 'baseline_policy_effectiveness_pct': 0.0, 'baseline_final_population_millions': 83.74442136215076, 'housing_tax_30_70_population_decline_pct': -36.416937345033304, 'housing_tax_30_70_aging_ratio_pct': 99.09438965509409, 'housing_tax_30_70_dependency_ratio': 11895.867914071097, 'housing_tax_30_70_policy_effectiveness_pct': -6.533520788776627, 'housing_tax_30_70_final_population_millions': 78.27296218301395, 'housing_tax_50_50_population_decline_pct': -36.25857906458071, 'housing_tax_50_50_aging_ratio_pct': 99.077287984295, 'housing_tax_50_50_dependency_ratio': 11678.664550295438, 'housing_tax_50_50_policy_effectiveness_pct': -6.300735667868473, 'housing_tax_50_50_final_population_millions': 78.46790673553566, 'housing_tax_70_30_population_decline_pct': -36.09321800616723, 'housing_tax_70_30_aging_ratio_pct': 99.06218258037329, 'housing_tax_70_30_dependency_ratio': 11493.55191854524, 'housing_tax_70_30_policy_effectiveness_pct': -6.057656531960534, 'housing_tax_70_30_final_population_millions': 78.6714719513539}
+Description: Analysis of housing affordability and tax incentives policy pair with different budget allocations (30-70, 50-50, 70-30 splits). Key findings:
+1. All combinations performed worse than baseline, with population declines of ~36% vs baseline ~32%
+2. Higher housing affordability ratios (70-30 split) showed slightly better performance (-36.09% decline)
+3. All combinations led to increased aging ratios and high dependency ratios
+4. Negative policy effectiveness scores (-6.06% to -6.53%)
+5. Results suggest these policies may have limited effectiveness when implemented in isolation
+6. Housing affordability appears marginally more effective than tax incentives
+7. The high dependency ratios (11,400-11,900) indicate potential sustainability issues
+8. Pattern consistent with other policy pairs: isolated implementation without supporting measures leads to suboptimal outcomes

@@ -1,0 +1,123 @@
+\begin{thebibliography}{16}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Alexander \& Raftery(2024)Alexander and
+  Raftery]{Alexander2024DevelopingAI}
+Monica Alexander and A.~Raftery.
+\newblock Developing and implementing the un's probabilistic population
+  projections as a milestone for bayesian demography: An interview with adrian
+  raftery.
+\newblock \emph{Demographic Research}, 2024.
+
+\bibitem[Alkema et~al.(2015)Alkema, Gerland, Raftery, and
+  Wilmoth]{Alkema2015TheUN}
+L.~Alkema, P.~Gerland, A.~Raftery, and J.~Wilmoth.
+\newblock The united nations probabilistic population projections: An
+  introduction to demographic forecasting with uncertainty.
+\newblock \emph{Foresight}, 2015 37:\penalty0 19--24, 2015.
+
+\bibitem[Compagnoni et~al.(2016)Compagnoni, Bibian, Ochocki, Rogers, Schultz,
+  Sneck, Elderd, Iler, Inouye, Jacquemyn, and Miller]{Compagnoni2016TheEO}
+A.~Compagnoni, Andrew~J. Bibian, Brad~M. Ochocki, Haldre~S. Rogers, Emily~L.
+  Schultz, Michelle~E. Sneck, B.~Elderd, A.~Iler, D.~Inouye, H.~Jacquemyn, and
+  T.~Miller.
+\newblock The effect of demographic correlations on the stochastic population
+  dynamics of perennial plants.
+\newblock \emph{Ecological Monographs}, 86:\penalty0 480--494, 2016.
+
+\bibitem[Elderd \& Miller(2015)Elderd and Miller]{Elderd2015QuantifyingDU}
+B.~Elderd and T.~Miller.
+\newblock Quantifying demographic uncertainty: Bayesian methods for integral
+  projection models.
+\newblock \emph{Ecological Monographs}, 86:\penalty0 125--144, 2015.
+
+\bibitem[Goodfellow et~al.(2014)Goodfellow, Pouget-Abadie, Mirza, Xu,
+  Warde-Farley, Ozair, Courville, and Bengio]{gan}
+Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley,
+  Sherjil Ozair, Aaron Courville, and Yoshua Bengio.
+\newblock Generative adversarial nets.
+\newblock In Z.~Ghahramani, M.~Welling, C.~Cortes, N.~Lawrence, and K.Q.
+  Weinberger (eds.), \emph{Advances in Neural Information Processing Systems},
+  volume~27. Curran Associates, Inc., 2014.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf}.
+
+\bibitem[Kingma \& Welling(2014)Kingma and Welling]{vae}
+Diederik~P. Kingma and Max Welling.
+\newblock {Auto-Encoding Variational Bayes}.
+\newblock In \emph{2nd International Conference on Learning Representations,
+  {ICLR} 2014, Banff, AB, Canada, April 14-16, 2014, Conference Track
+  Proceedings}, 2014.
+
+\bibitem[Lee \& Tuljapurkar(1994)Lee and Tuljapurkar]{Lee1994StochasticPF}
+Ronald Lee and S.~Tuljapurkar.
+\newblock Stochastic population forecasts for the united states: beyond high,
+  medium, and low.
+\newblock \emph{Journal of the American Statistical Association}, 89
+  428:\penalty0 1,175--89, 1994.
+
+\bibitem[Lu et~al.(2024)Lu, Lu, Lange, Foerster, Clune, and
+  Ha]{lu2024aiscientist}
+Chris Lu, Cong Lu, Robert~Tjarko Lange, Jakob Foerster, Jeff Clune, and David
+  Ha.
+\newblock The {AI} {S}cientist: Towards fully automated open-ended scientific
+  discovery.
+\newblock \emph{arXiv preprint arXiv:2408.06292}, 2024.
+
+\bibitem[Malafeyev et~al.(2024)Malafeyev, Nabiev, and
+  Redinskikh]{Malafeyev2024ModelingAD}
+O.~A. Malafeyev, T.~R. Nabiev, and N.~Redinskikh.
+\newblock Modeling a demographic problem using the leslie matrix.
+\newblock \emph{ArXiv}, abs/2409.15147, 2024.
+
+\bibitem[Nel \& Taeihagh(2024)Nel and Taeihagh]{Nel2024TheSU}
+Darren Nel and Araz Taeihagh.
+\newblock The soft underbelly of complexity science adoption in policymaking:
+  towards addressing frequently overlooked non-technical challenges.
+\newblock \emph{Policy Sciences}, 2024.
+
+\bibitem[Nelles et~al.(2024)Nelles, Tuckerman, Purna, Phillips, and
+  Vorley]{Nelles2024PolicyRT}
+Jen Nelles, L.~Tuckerman, Nadeen Purna, Judith Phillips, and Tim Vorley.
+\newblock Policy responses to the healthy aging challenge: Confronting
+  hybridity with social innovation.
+\newblock \emph{Journal of Aging & Social Policy}, 37:\penalty0 273 -- 288,
+  2024.
+
+\bibitem[Sohl-Dickstein et~al.(2015)Sohl-Dickstein, Weiss, Maheswaranathan, and
+  Ganguli]{Sohl-Dickstein2015DeepUL}
+Jascha~Narain Sohl-Dickstein, Eric~A. Weiss, Niru Maheswaranathan, and
+  S.~Ganguli.
+\newblock Deep unsupervised learning using nonequilibrium thermodynamics.
+\newblock \emph{ArXiv}, abs/1503.03585, 2015.
+
+\bibitem[Stupariu(2023)]{Stupariu2023DEMOGRAPHICPI}
+M.~Stupariu.
+\newblock Demographic policies in the european union.
+\newblock \emph{Revista Română de Geografie Politică}, 2023.
+
+\bibitem[Wiśniowski et~al.(2015)Wiśniowski, Smith, Bijak, Raymer, and
+  Forster]{Wiśniowski2015BayesianPF}
+Arkadiusz Wiśniowski, Peter W.~F. Smith, J.~Bijak, J.~Raymer, and J.~Forster.
+\newblock Bayesian population forecasting: Extending the lee-carter method.
+\newblock \emph{Demography}, 52:\penalty0 1035--1059, 2015.
+
+\bibitem[Yang et~al.(2023)Yang, Zhang, Song, Hong, Xu, Zhao, Zhang, Cui, and
+  Yang]{yang2023diffusion}
+Ling Yang, Zhilong Zhang, Yang Song, Shenda Hong, Runsheng Xu, Yue Zhao, Wentao
+  Zhang, Bin Cui, and Ming-Hsuan Yang.
+\newblock Diffusion models: A comprehensive survey of methods and applications.
+\newblock \emph{ACM Computing Surveys}, 56\penalty0 (4):\penalty0 1--39, 2023.
+
+\bibitem[Zhan \& Huang(2023)Zhan and Huang]{Zhan2023StateFI}
+Shaohua Zhan and Lingli Huang.
+\newblock State familism in action: aging policy and intergenerational support
+  in singapore.
+\newblock \emph{China Population and Development Studies}, 7:\penalty0
+  111--129, 2023.
+
+\end{thebibliography}

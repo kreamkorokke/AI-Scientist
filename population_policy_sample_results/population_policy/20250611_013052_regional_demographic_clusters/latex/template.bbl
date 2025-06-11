@@ -1,0 +1,119 @@
+\begin{thebibliography}{15}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Alexander \& Raftery(2024)Alexander and
+  Raftery]{Alexander2024DevelopingAI}
+Monica Alexander and A.~Raftery.
+\newblock Developing and implementing the un's probabilistic population
+  projections as a milestone for bayesian demography: An interview with adrian
+  raftery.
+\newblock \emph{Demographic Research}, 2024.
+
+\bibitem[Alkema et~al.(2015)Alkema, Gerland, Raftery, and
+  Wilmoth]{Alkema2015TheUN}
+L.~Alkema, P.~Gerland, A.~Raftery, and J.~Wilmoth.
+\newblock The united nations probabilistic population projections: An
+  introduction to demographic forecasting with uncertainty.
+\newblock \emph{Foresight}, 2015 37:\penalty0 19--24, 2015.
+
+\bibitem[Goodfellow et~al.(2014)Goodfellow, Pouget-Abadie, Mirza, Xu,
+  Warde-Farley, Ozair, Courville, and Bengio]{gan}
+Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley,
+  Sherjil Ozair, Aaron Courville, and Yoshua Bengio.
+\newblock Generative adversarial nets.
+\newblock In Z.~Ghahramani, M.~Welling, C.~Cortes, N.~Lawrence, and K.Q.
+  Weinberger (eds.), \emph{Advances in Neural Information Processing Systems},
+  volume~27. Curran Associates, Inc., 2014.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf}.
+
+\bibitem[Goodfellow et~al.(2016)Goodfellow, Bengio, Courville, and
+  Bengio]{goodfellow2016deep}
+Ian Goodfellow, Yoshua Bengio, Aaron Courville, and Yoshua Bengio.
+\newblock \emph{Deep learning}, volume~1.
+\newblock MIT Press, 2016.
+
+\bibitem[Ho et~al.(2020)Ho, Jain, and Abbeel]{ddpm}
+Jonathan Ho, Ajay Jain, and Pieter Abbeel.
+\newblock Denoising diffusion probabilistic models.
+\newblock In H.~Larochelle, M.~Ranzato, R.~Hadsell, M.F. Balcan, and H.~Lin
+  (eds.), \emph{Advances in Neural Information Processing Systems}, volume~33,
+  pp.\  6840--6851. Curran Associates, Inc., 2020.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper/2020/file/4c5bcfec8584af0d967f1ab10179ca4b-Paper.pdf}.
+
+\bibitem[Horgli et~al.(2024)Horgli, Mensah-Bonsu, and
+  Adjei-Nsiah]{Horgli2024OptimalLR}
+Agbenyegah~Kwami Horgli, A.~Mensah-Bonsu, and Samuel Adjei-Nsiah.
+\newblock Optimal land resource allocation for tree crop enterprises among
+  farmers in the eastern region of ghana: A target motad linear programming
+  analysis.
+\newblock \emph{African Journal of Agricultural and Resource Economics}, 2024.
+
+\bibitem[Kingma \& Welling(2014)Kingma and Welling]{vae}
+Diederik~P. Kingma and Max Welling.
+\newblock {Auto-Encoding Variational Bayes}.
+\newblock In \emph{2nd International Conference on Learning Representations,
+  {ICLR} 2014, Banff, AB, Canada, April 14-16, 2014, Conference Track
+  Proceedings}, 2014.
+
+\bibitem[Li et~al.(2018)Li, Yang, Li, and Shu]{Li2018ProjectionOP}
+Shuang Li, Zewei Yang, Hongsheng Li, and Guangwen Shu.
+\newblock Projection of population structure in china using least squares
+  support vector machine in conjunction with a leslie matrix model.
+\newblock \emph{Journal of Forecasting}, 2018.
+
+\bibitem[Lu et~al.(2024)Lu, Lu, Lange, Foerster, Clune, and
+  Ha]{lu2024aiscientist}
+Chris Lu, Cong Lu, Robert~Tjarko Lange, Jakob Foerster, Jeff Clune, and David
+  Ha.
+\newblock The {AI} {S}cientist: Towards fully automated open-ended scientific
+  discovery.
+\newblock \emph{arXiv preprint arXiv:2408.06292}, 2024.
+
+\bibitem[Malafeyev et~al.(2024)Malafeyev, Nabiev, and
+  Redinskikh]{Malafeyev2024ModelingAD}
+O.~A. Malafeyev, T.~R. Nabiev, and N.~Redinskikh.
+\newblock Modeling a demographic problem using the leslie matrix.
+\newblock \emph{ArXiv}, abs/2409.15147, 2024.
+
+\bibitem[Raftery et~al.(2014)Raftery, Alkema, and
+  Gerland]{Raftery2014BayesianPP}
+A.~Raftery, L.~Alkema, and P.~Gerland.
+\newblock Bayesian population projections for the united nations.
+\newblock \emph{Statistical science : a review journal of the Institute of
+  Mathematical Statistics}, 29 1:\penalty0 58--68, 2014.
+
+\bibitem[Sohl-Dickstein et~al.(2015)Sohl-Dickstein, Weiss, Maheswaranathan, and
+  Ganguli]{pmlr-v37-sohl-dickstein15}
+Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli.
+\newblock Deep unsupervised learning using nonequilibrium thermodynamics.
+\newblock In Francis Bach and David Blei (eds.), \emph{Proceedings of the 32nd
+  International Conference on Machine Learning}, volume~37 of \emph{Proceedings
+  of Machine Learning Research}, pp.\  2256--2265, Lille, France, 07--09 Jul
+  2015. PMLR.
+
+\bibitem[Thomas \& Clark(2011)Thomas and Clark]{Thomas2011MoreOT}
+Jason~R. Thomas and S.~Clark.
+\newblock More on the cohort-component model of population projection in the
+  context of hiv/aids: A leslie matrix representation and new estimates.
+\newblock \emph{Demographic research}, 25:\penalty0 39--102, 2011.
+
+\bibitem[Vindenes et~al.(2021)Vindenes, Coeur, and
+  Caswell]{Vindenes2021IntroductionTM}
+Y.~Vindenes, Christie~Le Coeur, and H.~Caswell.
+\newblock Introduction to matrix population models.
+\newblock \emph{Demographic Methods across the Tree of Life}, 2021.
+
+\bibitem[Yang et~al.(2023)Yang, Zhang, Song, Hong, Xu, Zhao, Zhang, Cui, and
+  Yang]{yang2023diffusion}
+Ling Yang, Zhilong Zhang, Yang Song, Shenda Hong, Runsheng Xu, Yue Zhao, Wentao
+  Zhang, Bin Cui, and Ming-Hsuan Yang.
+\newblock Diffusion models: A comprehensive survey of methods and applications.
+\newblock \emph{ACM Computing Surveys}, 56\penalty0 (4):\penalty0 1--39, 2023.
+
+\end{thebibliography}

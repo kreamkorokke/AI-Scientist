@@ -1,0 +1,106 @@
+\begin{thebibliography}{14}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Billari et~al.(2014)Billari, Graziani, and
+  Melilli]{Billari2014StochasticPF}
+F.~Billari, R.~Graziani, and E.~Melilli.
+\newblock Stochastic population forecasting based on combinations of expert
+  evaluations within the bayesian paradigm.
+\newblock \emph{Demography}, 51:\penalty0 1933--1954, 2014.
+
+\bibitem[Booth(2020)]{Booth2020CoherentMF}
+H.~Booth.
+\newblock Coherent mortality forecasting with standards: Low mortality serves
+  as a guide.
+\newblock \emph{Developments in Demographic Forecasting}, 2020.
+
+\bibitem[Cook et~al.(2022)Cook, Iarskaia-Smirnova, and
+  Kozlov]{Cook2022TryingTR}
+L.~Cook, E.~Iarskaia-Smirnova, and V.~Kozlov.
+\newblock Trying to reverse demographic decline: Pro-natalist and family
+  policies in russia, poland and hungary.
+\newblock \emph{Social Policy and Society}, 22:\penalty0 355 -- 375, 2022.
+
+\bibitem[Dijk et~al.(2020)Dijk, Iversen, Klitkou, Kemp, Bolwig, Borup, and
+  Møllgaard]{Dijk2020ForksIT}
+M.~Dijk, E.~Iversen, Antje Klitkou, R.~Kemp, S.~Bolwig, M.~Borup, and Peter
+  Møllgaard.
+\newblock Forks in the road to e-mobility: An evaluation of instrument
+  interaction in national policy mixes in northwest europe.
+\newblock \emph{Energies}, 13:\penalty0 475, 2020.
+
+\bibitem[Grant \& Benton(1996)Grant and Benton]{Grant1996TheIO}
+Grant and Benton.
+\newblock The impact of environmental variation on demographic convergence of
+  leslie matrix population models: An assessment using lyapunov characteristic
+  exponents.
+\newblock \emph{Theoretical population biology}, 50 1:\penalty0 18--30, 1996.
+
+\bibitem[Kobyakova et~al.(2024)Kobyakova, Shibalkov, Solomatnikov, Timonin,
+  Shchur, Lagutin, Tyufilin, Deev, and Nikitina]{Kobyakova2024TheMA}
+O.~Kobyakova, I.~Shibalkov, I.~Solomatnikov, S.A. Timonin, A.~E. Shchur,
+  M.~Lagutin, D.~Tyufilin, I.~Deev, and S.~Nikitina.
+\newblock The medical and demographic situation in russia: Long-term trends,
+  prospects and improvement potential.
+\newblock \emph{Health Risk Analysis}, 2024.
+
+\bibitem[Lu et~al.(2024)Lu, Lu, Lange, Foerster, Clune, and
+  Ha]{lu2024aiscientist}
+Chris Lu, Cong Lu, Robert~Tjarko Lange, Jakob Foerster, Jeff Clune, and David
+  Ha.
+\newblock The {AI} {S}cientist: Towards fully automated open-ended scientific
+  discovery.
+\newblock \emph{arXiv preprint arXiv:2408.06292}, 2024.
+
+\bibitem[López et~al.(2022)López, Varga, Gámez, and
+  Garay]{López2022MonitoringIA}
+I.~López, Z.~Varga, M.~Gámez, and J.~Garay.
+\newblock Monitoring in a discrete-time nonlinear age-structured population
+  model with changing environment.
+\newblock \emph{Mathematics}, 2022.
+
+\bibitem[Malafeyev et~al.(2024)Malafeyev, Nabiev, and
+  Redinskikh]{Malafeyev2024ModelingAD}
+O.~A. Malafeyev, T.~R. Nabiev, and N.~Redinskikh.
+\newblock Modeling a demographic problem using the leslie matrix.
+\newblock \emph{ArXiv}, abs/2409.15147, 2024.
+
+\bibitem[Myrskylä \& Goldstein(2010)Myrskylä and
+  Goldstein]{Myrskylä2010ProbabilisticFU}
+M.~Myrskylä and J.~Goldstein.
+\newblock Probabilistic forecasting using stochastic diffusion models, with
+  applications to cohort processes of marriage and fertility.
+\newblock \emph{Demography}, 50:\penalty0 237--260, 2010.
+
+\bibitem[ting Zhang et~al.(2023)ting Zhang, Cai, Shi, Zhu, and nan
+  Shan]{Zhang2023TheEO}
+Ting ting Zhang, Xiu-Yun Cai, Xiaohui. Shi, Wei Zhu, and Shao nan Shan.
+\newblock The effect of family fertility support policies on fertility, their
+  contribution, and policy pathways to fertility improvement in oecd countries.
+\newblock \emph{International Journal of Environmental Research and Public
+  Health}, 20, 2023.
+
+\bibitem[Wei et~al.(2024)Wei, Ji, and Li]{Wei2024TheSE}
+Jiuchang Wei, Junkai Ji, and Yi‐Na Li.
+\newblock The synergy effect of multi‐country policy actions announced in
+  reaction to global risk: A network structure perspective.
+\newblock \emph{Risk Analysis}, 44:\penalty0 2089 -- 2106, 2024.
+
+\bibitem[Yu et~al.(2023)Yu, Ševčíková, Raftery, and
+  Curran]{Yu2023ProbabilisticCP}
+C.~Yu, H.~Ševčíková, A.~Raftery, and S.~Curran.
+\newblock Probabilistic county-level population projections.
+\newblock \emph{Demography}, 2023.
+
+\bibitem[Zakharov(2024)]{Zakharov2024ThreeDO}
+Sergei~V. Zakharov.
+\newblock Three decades on russia’s path of the second demographic
+  transition: How patterns of fertility are changing under an unstable
+  demographic policy.
+\newblock \emph{Comparative Population Studies}, 2024.
+
+\end{thebibliography}

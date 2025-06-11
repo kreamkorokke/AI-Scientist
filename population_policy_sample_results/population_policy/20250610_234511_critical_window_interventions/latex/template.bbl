@@ -1,0 +1,82 @@
+\begin{thebibliography}{11}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Alkema et~al.(2015)Alkema, Gerland, Raftery, and
+  Wilmoth]{Alkema2015TheUN}
+L.~Alkema, P.~Gerland, A.~Raftery, and J.~Wilmoth.
+\newblock The united nations probabilistic population projections: An
+  introduction to demographic forecasting with uncertainty.
+\newblock \emph{Foresight}, 2015 37:\penalty0 19--24, 2015.
+
+\bibitem[Cohen(1979)]{Cohen1979ErgodicTO}
+J.~Cohen.
+\newblock Ergodic theorems of population dynamics.
+\newblock \emph{Rocky Mountain Journal of Mathematics}, 9:\penalty0 27--28,
+  1979.
+
+\bibitem[Fosdick \& Raftery(2012)Fosdick and Raftery]{Fosdick2012RegionalPF}
+B.~Fosdick and A.~Raftery.
+\newblock Regional probabilistic fertility forecasting by modeling
+  between-country correlations.
+\newblock \emph{Demographic research}, 30 35:\penalty0 1011--1034, 2012.
+
+\bibitem[ho(2020)]{ho2020StochasticPP}
+O.~ho.
+\newblock Stochastic population projections on an uncertainty for the future
+  korea.
+\newblock volume~33, pp.\  185--201, 2020.
+
+\bibitem[Lamnisos et~al.(2019)Lamnisos, Giannakou, and
+  Siligari]{Lamnisos2019DemographicFO}
+D.~Lamnisos, K.~Giannakou, and T.~Siligari.
+\newblock Demographic forecasting of population projection in greece: A
+  bayesian probabilistic study.
+\newblock \emph{European Journal of Public Health}, 2019.
+
+\bibitem[Lu et~al.(2024)Lu, Lu, Lange, Foerster, Clune, and
+  Ha]{lu2024aiscientist}
+Chris Lu, Cong Lu, Robert~Tjarko Lange, Jakob Foerster, Jeff Clune, and David
+  Ha.
+\newblock The {AI} {S}cientist: Towards fully automated open-ended scientific
+  discovery.
+\newblock \emph{arXiv preprint arXiv:2408.06292}, 2024.
+
+\bibitem[Oizumi et~al.(2022)Oizumi, Inaba, Takada, Enatsu, and
+  Kinjo]{Oizumi2022SensitivityAO}
+Ryo Oizumi, H.~Inaba, T.~Takada, Youichi Enatsu, and Kensaku Kinjo.
+\newblock Sensitivity analysis on the declining population in japan: Effects of
+  prefecture-specific fertility and interregional migration.
+\newblock \emph{PLoS ONE}, 17, 2022.
+
+\bibitem[Osés-Arranz \& Quilis(2017)Osés-Arranz and
+  Quilis]{Osés-Arranz2017ProbabilisticPP}
+Ainhoa Osés-Arranz and Enrique~M. Quilis.
+\newblock Probabilistic population projections using monte carlo methods:
+  Spain, 2016-2066.
+\newblock \emph{Labor: Demographics & Economics of the Family eJournal}, 2017.
+
+\bibitem[Raftery et~al.(2014)Raftery, Alkema, and
+  Gerland]{Raftery2014BayesianPP}
+A.~Raftery, L.~Alkema, and P.~Gerland.
+\newblock Bayesian population projections for the united nations.
+\newblock \emph{Statistical science : a review journal of the Institute of
+  Mathematical Statistics}, 29 1:\penalty0 58--68, 2014.
+
+\bibitem[Smith et~al.(2001)Smith, Tayman, and Swanson]{Smith2001StateAL}
+Stanley~K. Smith, J.~Tayman, and D.~Swanson.
+\newblock State and local population projections: Methodology and analysis.
+\newblock 2001.
+
+\bibitem[Young-Chool et~al.(2025)Young-Chool, Ju, Lee, Kim, and
+  Yun]{Young-Chool2025ExploringAT}
+Choi Young-Chool, Sanghyun Ju, Gyutae Lee, Sangkun Kim, and Sungho Yun.
+\newblock Exploring approaches to low fertility through integrated application
+  of big data-based topic modeling and system dynamics: The case of south
+  korea.
+\newblock \emph{Data and Metadata}, 2025.
+
+\end{thebibliography}

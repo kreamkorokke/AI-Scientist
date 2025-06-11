@@ -1,0 +1,21 @@
+POPULATION DYNAMICS MODEL - SUMMARY REPORT
+==================================================
+
+Model Configuration:
+- Model Type: stochastic_leslie
+- Hidden Dimension: Unknown
+- Training Epochs: Unknown
+- Prediction Horizon: Unknown years
+
+Policy Scenario Results (Population Change by 2050):
+--------------------------------------------------
+Baseline......................  -30.8%
+Pro Natalist..................  -24.6%
+Immigration Focused...........  -29.0%
+Work Life Balance.............  -25.9%
+Regional Development..........  -26.5%
+Comprehensive.................  -21.9%
+Elder Care Focus..............  -21.4%
+
+Note: Negative values indicate population decline.
+Values are relative to 2024 baseline population.

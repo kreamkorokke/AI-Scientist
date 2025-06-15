@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+import argparse
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+from typing import Dict, Any
+
+
 """
 Interactive Population Policy Explorer for AI-Scientist
 
@@ -14,14 +23,6 @@ Example policy directions:
 - "Immigration-centric policies with integration support"
 - "Work-life balance improvements for young families"
 """
-
-import json
-import os
-import sys
-import subprocess
-import argparse
-from pathlib import Path
-from typing import Dict, Any
 
 
 class InteractivePopulationPolicy:
@@ -149,13 +150,9 @@ class InteractivePopulationPolicy:
                     else:
                         print(f"Direction: \"{selected['direction']}\"")
                     
-                    try:
-                        confirm = input("\nProceed with this selection? (y/n): ").strip().lower()
-                        if confirm in ['y', 'yes']:
-                            return selected['direction']  # Returns None for original prompt
-                    except EOFError:
-                        print("\n\n👋 Goodbye!")
-                        sys.exit(0)
+                    confirm = self._get_confirmation("Proceed with this selection?")
+                    if confirm:
+                        return selected['direction']
                     
                 elif choice == str(len(examples) + 1):
                     print("\n📝 Enter your custom policy direction:")
@@ -164,22 +161,14 @@ class InteractivePopulationPolicy:
                     print("- 'regional development focused on rural sustainability'")
                     print("- 'innovative childcare policies with AI and automation support'")
                     
-                    try:
-                        custom_direction = input("\nYour direction: ").strip()
-                        if custom_direction:
-                            print(f"\n✓ Custom direction: \"{custom_direction}\"")
-                            try:
-                                confirm = input("Proceed with this direction? (y/n): ").strip().lower()
-                                if confirm in ['y', 'yes']:
-                                    return custom_direction
-                            except EOFError:
-                                print("\n\n👋 Goodbye!")
-                                sys.exit(0)
-                        else:
-                            print("⚠ Direction cannot be empty.")
-                    except EOFError:
-                        print("\n\n👋 Goodbye!")
-                        sys.exit(0)
+                    custom_direction = input("\nYour direction: ").strip()
+                    if custom_direction:
+                        print(f"\n✓ Custom direction: \"{custom_direction}\"")
+                        confirm = self._get_confirmation("Proceed with this direction?")
+                        if confirm:
+                            return custom_direction
+                    else:
+                        print("⚠ Direction cannot be empty.")
                 
                 else:
                     print(f"⚠ Invalid choice. Please enter 1-{len(examples)+1}")
@@ -232,16 +221,12 @@ class InteractivePopulationPolicy:
                     return selected['id']
                     
                 elif choice == str(len(models) + 1):
-                    try:
-                        custom_model = input("\nEnter custom model ID: ").strip()
-                        if custom_model:
-                            print(f"\n✓ Custom model: {custom_model}")
-                            return custom_model
-                        else:
-                            print("⚠ Model ID cannot be empty.")
-                    except EOFError:
-                        print("\n\n👋 Goodbye!")
-                        sys.exit(0)
+                    custom_model = input("\nEnter custom model ID: ").strip()
+                    if custom_model:
+                        print(f"\n✓ Custom model: {custom_model}")
+                        return custom_model
+                    else:
+                        print("⚠ Model ID cannot be empty.")
                 
                 else:
                     print(f"⚠ Invalid choice. Please enter 1-{len(models)+1} or press Enter for default")
@@ -353,11 +338,9 @@ class InteractivePopulationPolicy:
             print(f"❌ Could not find launch_scientist.py")
             print("Make sure you're running this from the AI-Scientist root directory.")
             return False
-
-    def run_interactive_session(self, default_model: str = "claude-3-5-sonnet-20241022", 
-                               default_num_ideas: int = 1):
-        """Run complete interactive session."""
-        
+    
+    def _display_welcome_message(self):
+        """Display welcome message and instructions."""
         print("🧬 INTERACTIVE POPULATION POLICY EXPLORER")
         print("=" * 60)
         print("This tool allows you to dynamically explore population policy")
@@ -369,6 +352,28 @@ class InteractivePopulationPolicy:
         print("3. Generate a custom prompt for AI-Scientist")
         print("4. Run experiments with your specified focus")
         print("5. Generate comprehensive analysis plots")
+    
+    def _cleanup_prompt_if_needed(self, policy_direction):
+        """Clean up prompt modifications if they were made."""
+        if policy_direction is not None:
+            print("\n🔄 Restoring original prompt.json...")
+            self.restore_original_prompt()
+        else:
+            print("\n💡 No prompt modifications were made.")
+    
+    def _get_confirmation(self, message: str) -> bool:
+        """Get confirmation from user with consistent error handling."""
+        try:
+            response = input(f"\n{message} (y/n): ").strip().lower()
+            return response in ['y', 'yes']
+        except (EOFError, KeyboardInterrupt):
+            print("\n\n👋 Goodbye!")
+            sys.exit(0)
+
+    def run_interactive_session(self, default_model: str = "claude-3-5-sonnet-20241022", 
+                               default_num_ideas: int = 1):
+        """Run complete interactive session."""
+        self._display_welcome_message()
         
         # Backup original prompt
         self.backup_original_prompt()
@@ -403,14 +408,9 @@ class InteractivePopulationPolicy:
             print(f"  Number of ideas: {num_ideas}")
             print(f"  Focus: {task_focus}")
             
-            try:
-                proceed = input(f"\nProceed with experiment? (y/n): ").strip().lower()
-                if proceed not in ['y', 'yes']:
-                    print("❌ Experiment cancelled.")
-                    return
-            except EOFError:
-                print("\n\n👋 Goodbye!")
-                sys.exit(0)
+            if not self._get_confirmation("Proceed with experiment?"):
+                print("❌ Experiment cancelled.")
+                return
             
             # Run AI-Scientist
             success = self.run_ai_scientist(model, num_ideas)
@@ -418,12 +418,7 @@ class InteractivePopulationPolicy:
         except KeyboardInterrupt:
             print(f"\n\n🛑 Session interrupted by user.")
         finally:
-            # Automatically restore original prompt (only if we modified it)
-            if 'policy_direction' in locals() and policy_direction is not None:
-                print("\n🔄 Restoring original prompt.json...")
-                self.restore_original_prompt()
-            else:
-                print("\n💡 No prompt modifications were made.")
+            self._cleanup_prompt_if_needed(locals().get('policy_direction'))
 
 
 def main():

@@ -1,3 +1,22 @@
+import argparse
+import json
+import os
+import pickle
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
+
+import numpy as np
+import pandas as pd
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+from data_pipeline import JapanDemographicDataPipeline
+
+
 """
 Pure Mathematical Population Dynamics Modeling and Policy Simulation
 
@@ -5,23 +24,6 @@ This module implements deterministic and stochastic demographic models using
 classical Leslie matrix approaches with policy intervention parameters 
 affecting demographic rates directly.
 """
-
-import argparse
-import json
-import os
-import pickle
-from typing import Dict, List, Tuple
-import numpy as np
-import pandas as pd
-from dataclasses import dataclass
-
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass  # dotenv not available, continue without it
-
-from data_pipeline import JapanDemographicDataPipeline
 
 @dataclass
 class DemographicModelConfig:
@@ -723,8 +725,6 @@ def extract_key_metrics_from_results(results_dir: str) -> Dict[str, float]:
         Dictionary of key metrics with standardized names and float values
     """
     try:
-        # Load experimental results
-        import pickle
         results_path = os.path.join(results_dir, "results.pkl")
         config_path = os.path.join(results_dir, "config.json")
         
@@ -738,14 +738,12 @@ def extract_key_metrics_from_results(results_dir: str) -> Dict[str, float]:
         with open(config_path, "r") as f:
             config_dict = json.load(f)
             
-        # Create a temporary config object
         config = DemographicModelConfig(
             model_type=config_dict.get('model_type', 'leslie_matrix'),
             age_groups=config_dict.get('age_groups', 21),
             projection_years=config_dict.get('projection_years', 30)
         )
         
-        # Create temporary experiment instance and extract metrics
         temp_experiment = PopulationExperiment(config)
         temp_experiment.results = results
         
